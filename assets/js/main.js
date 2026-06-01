@@ -114,3 +114,21 @@ function chartDoughnut(id, labels, data) {
     options: { responsive:true, plugins:{ legend:{ position:'bottom', labels:{ boxWidth:12, font:{size:11} } } } }
   });
 }
+
+// ── Chart: Grouped Bar (dùng cho so sánh) ────────────────────
+function chartBar2(id, labels, datasets) {
+  const ctx = document.getElementById(id);
+  if (!ctx) return null;
+  return new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      interaction: { mode:'index', intersect:false },
+      plugins: { legend:{ position:'bottom', labels:{ boxWidth:12, font:{size:11} } } },
+      scales: {
+        y: { suggestedMin:15, suggestedMax:30, title:{ display:true, text:'Điểm chuẩn' } }
+      }
+    }
+  });
+}

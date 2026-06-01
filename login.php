@@ -1,4 +1,7 @@
 <?php
+// ============================================================
+//  login.php — Đăng nhập Admin (dùng MD5)
+// ============================================================
 require_once 'includes/functions.php';
 startSession();
 if (isAdmin()) redirect('admin/dashboard.php');
@@ -12,15 +15,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $db->prepare("SELECT * FROM users WHERE username = ? LIMIT 1");
         $stmt->execute([$user]);
         $row  = $stmt->fetch();
-        if ($row && password_verify($pass, $row['password'])) {
-            $_SESSION['user_id']  = $row['user_id'];
-            $_SESSION['username'] = $row['username'];
-            $_SESSION['role']     = $row['role'];
-            redirect('admin/dashboard.php');
+        if ($row) {
+            $ok = false;
+            // Thử MD5
+            if (md5($pass) === $row['password']) $ok = true;
+            // Thử bcrypt
+            if (!$ok && password_verify($pass, $row['password'])) $ok = true;
+            // Thử plain text (phòng trường hợp)
+            if (!$ok && $pass === $row['password']) $ok = true;
+
+            if ($ok) {
+                $_SESSION['user_id']  = $row['user_id'];
+                $_SESSION['username'] = $row['username'];
+                $_SESSION['role']     = $row['role'];
+                redirect('admin/dashboard.php');
+            }
         }
-        $err = 'Tên đăng nhập hoặc mật khẩu không đúng.';
+        $err = 'Sai tài khoản hoặc mật khẩu!';
     } else {
-        $err = 'Vui lòng điền đầy đủ thông tin.';
+        $err = 'Vui lòng điền đầy đủ!';
     }
 }
 ?>
@@ -34,41 +47,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <link rel="stylesheet" href="<?= url('assets/css/style.css') ?>">
 </head>
 <body class="bg-light">
-
 <div class="min-vh-100 d-flex align-items-center justify-content-center p-3">
-  <div class="card shadow" style="width:380px">
+  <div class="card shadow" style="width:420px">
     <div class="card-body p-5">
       <div class="text-center mb-4">
-        <div style="font-size:48px">🔐</div>
+        <div style="font-size:52px">🔐</div>
         <h4 class="fw-bold mt-2 mb-1">Đăng nhập Admin</h4>
-        <p class="text-muted small mb-0">Hệ thống Tra cứu Điểm chuẩn ĐH</p>
+        <p class="text-muted small">DiemChuan.vn</p>
       </div>
 
       <?php if ($err): ?>
-      <div class="alert alert-danger small py-2">
-        <i class="bi bi-exclamation-triangle me-1"></i><?= e($err) ?>
+      <div class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle me-1"></i><?= htmlspecialchars($err) ?>
       </div>
       <?php endif; ?>
 
       <form method="POST">
         <div class="mb-3">
-          <label class="form-label fw-semibold small">Tên đăng nhập</label>
-          <input type="text" name="username" class="form-control"
-                 placeholder="admin" required autofocus>
+          <label class="form-label fw-semibold">Tên đăng nhập</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-person"></i></span>
+            <input type="text" name="username" class="form-control form-control-lg"
+                   value="admin" required autofocus>
+          </div>
         </div>
         <div class="mb-4">
-          <label class="form-label fw-semibold small">Mật khẩu</label>
-          <input type="password" name="password" class="form-control"
-                 placeholder="••••••••" required>
+          <label class="form-label fw-semibold">Mật khẩu</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+            <input type="password" name="password" id="passInput"
+                   class="form-control form-control-lg" placeholder="••••••••" required>
+            <button type="button" class="btn btn-outline-secondary"
+              onclick="var p=document.getElementById('passInput');p.type=p.type==='password'?'text':'password'">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
         </div>
-        <button type="submit" class="btn btn-primary w-100 fw-bold py-2">
+        <button type="submit" class="btn btn-primary w-100 fw-bold py-2 fs-5">
           <i class="bi bi-box-arrow-in-right me-1"></i>Đăng nhập
         </button>
       </form>
 
-      <div class="text-center mt-4">
-        <p class="text-muted small mb-1">Tài khoản mặc định:</p>
-        <code>admin</code> / <code>admin123</code>
+      <hr class="my-3">
+      <div class="text-center">
+        <p class="small text-muted mb-2">Nếu vẫn không đăng nhập được:</p>
+        <a href="check_login.php" class="btn btn-warning btn-sm w-100">
+          🔧 Mở check_login.php để đặt lại mật khẩu
+        </a>
       </div>
       <div class="text-center mt-3">
         <a href="<?= url('index.php') ?>" class="small text-muted">
@@ -78,7 +103,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
   </div>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

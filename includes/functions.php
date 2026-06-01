@@ -1,7 +1,37 @@
 <?php
 require_once __DIR__.'/config.php';
 require_once __DIR__.'/db.php';
-require_once __DIR__.'/auth.php';
+
+// ── Auth & Session (gộp vào đây để tránh lỗi thứ tự load) ──
+function startSession():void {
+    if (session_status() === PHP_SESSION_NONE) session_start();
+}
+function isAdmin():bool {
+    startSession();
+    return isset($_SESSION['user_id']) && $_SESSION['role'] === 'admin';
+}
+function requireAdmin():void {
+    if (!isAdmin()) { header('Location:'.url('login.php')); exit; }
+}
+function setFlash(string $t, string $m):void {
+    startSession();
+    $_SESSION['flash'] = compact('t','m');
+}
+function getFlash():?array {
+    startSession();
+    if (isset($_SESSION['flash'])) {
+        $f = $_SESSION['flash'];
+        unset($_SESSION['flash']);
+        return ['type'=>$f['t'], 'msg'=>$f['m']];
+    }
+    return null;
+}
+function checkPassword(string $input, string $stored): bool {
+    if (strlen($stored) === 60 && str_starts_with($stored, '$2')) {
+        return password_verify($input, $stored);
+    }
+    return md5($input) === $stored;
+}
 
 function e(string $s):string{ return htmlspecialchars($s,ENT_QUOTES,'UTF-8'); }
 

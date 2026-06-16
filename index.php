@@ -16,13 +16,14 @@ $uniResults = [];
 if ($q !== '') {
     $stmt = $db->prepare("
         SELECT u.university_id, u.university_name, u.university_code,
-               u.province, u.logo, u.school_type,
+               u.province, u.school_type,
                COUNT(DISTINCT s.major_id) AS mcnt,
                MAX(s.score) AS top_score
         FROM universities u
         LEFT JOIN admission_scores s ON u.university_id=s.university_id
         WHERE u.university_name LIKE :q
-        GROUP BY u.university_id ORDER BY top_score DESC
+        GROUP BY u.university_id 
+        ORDER BY top_score DESC
     ");
     $stmt->execute([':q' => "%$q%"]);
     $uniResults = $stmt->fetchAll();
@@ -62,7 +63,7 @@ if ($mid) {
 
     $stmt = $db->prepare("
         SELECT u.university_id, u.university_name, u.university_code,
-               u.province, u.logo, u.school_type,
+               u.province, u.school_type,
                s.score, s.combination, s.method, s.quota, s.year
         FROM admission_scores s
         JOIN universities u ON s.university_id = u.university_id
@@ -79,19 +80,29 @@ $featuredUnis = [];
 if (!$q && !$mid) {
     $featuredUnis = $db->query("
         SELECT u.university_id, u.university_name, u.university_code,
-               u.province, u.logo, u.school_type,
+               u.province, u.school_type,
                COUNT(DISTINCT s.major_id) AS mcnt,
                MAX(s.score) AS top_score
         FROM universities u
         LEFT JOIN admission_scores s ON u.university_id=s.university_id
         WHERE u.is_featured=1
-        GROUP BY u.university_id ORDER BY top_score DESC
+        GROUP BY u.university_id 
+        ORDER BY top_score DESC
     ")->fetchAll();
 }
 
 $stats = $db->query("SELECT
     (SELECT COUNT(*) FROM universities) AS unis,
     (SELECT COUNT(*) FROM admission_scores) AS scores")->fetch();
+
+function uni_code_box($code, $name, $length = 4) {
+    $code = trim((string)$code);
+    if ($code !== '') {
+        return $code;
+    }
+
+    return mb_substr(trim((string)$name), 0, $length, 'UTF-8');
+}
 ?>
 
 <!-- HERO -->
@@ -240,12 +251,9 @@ $stats = $db->query("SELECT
 
             <td>
               <div class="d-flex align-items-center gap-2">
-                <div class="uni-logo flex-shrink-0" style="width:36px;height:36px;font-size:11px">
-                  <?php if($r['logo']??null): ?>
-                    <img src="<?= url('uploads/'.$r['logo']) ?>" alt="">
-                  <?php else: ?>
-                    <?= e(substr($r['university_code']??'?',0,3)) ?>
-                  <?php endif; ?>
+                <div class="uni-logo flex-shrink-0 d-flex align-items-center justify-content-center"
+                     style="width:36px;height:36px;font-size:10px;font-weight:700">
+                  <?= e(uni_code_box($r['university_code'] ?? '', $r['university_name'] ?? '', 3)) ?>
                 </div>
 
                 <div>
@@ -352,12 +360,9 @@ $stats = $db->query("SELECT
       <a href="<?= url('university.php?id='.$u['university_id']) ?>"
          class="uni-card h-100 text-decoration-none">
         <div class="d-flex align-items-center gap-3 mb-3">
-          <div class="uni-logo flex-shrink-0" style="width:48px;height:48px;font-size:13px">
-            <?php if($u['logo']): ?>
-              <img src="<?= url('uploads/'.$u['logo']) ?>" alt="">
-            <?php else: ?>
-              <?= e(substr($u['university_code']??'?',0,4)) ?>
-            <?php endif; ?>
+          <div class="uni-logo flex-shrink-0 d-flex align-items-center justify-content-center"
+               style="width:48px;height:48px;font-size:12px;font-weight:700">
+            <?= e(uni_code_box($u['university_code'] ?? '', $u['university_name'] ?? '', 4)) ?>
           </div>
 
           <div class="overflow-hidden">
@@ -410,12 +415,9 @@ $stats = $db->query("SELECT
       <a href="<?= url('university.php?id='.$u['university_id']) ?>"
          class="uni-card h-100 text-decoration-none">
         <div class="d-flex align-items-center gap-3 mb-3">
-          <div class="uni-logo flex-shrink-0" style="width:48px;height:48px;font-size:13px">
-            <?php if($u['logo']): ?>
-              <img src="<?= url('uploads/'.$u['logo']) ?>" alt="">
-            <?php else: ?>
-              <?= e(substr($u['university_code']??'?',0,4)) ?>
-            <?php endif; ?>
+          <div class="uni-logo flex-shrink-0 d-flex align-items-center justify-content-center"
+               style="width:48px;height:48px;font-size:12px;font-weight:700">
+            <?= e(uni_code_box($u['university_code'] ?? '', $u['university_name'] ?? '', 4)) ?>
           </div>
 
           <div class="overflow-hidden">

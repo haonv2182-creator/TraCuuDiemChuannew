@@ -340,10 +340,42 @@ $hasFilter = $q||$major||$year||$combo||$province||$stype||$method||$min||$max;
             </div>
           </div>
 
-          <button type="submit" class="btn btn-primary w-100 fw-semibold">
-            <i class="bi bi-search me-1"></i>Tìm kiếm
-          </button>
+          <button type="submit" class="btn btn-primary w-100 fw-semibold d-none">
+  <i class="bi bi-search me-1"></i>Tìm kiếm
+</button>
 
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const form = document.getElementById('filterForm');
+  if (!form) return;
+
+  let typingTimer;
+
+  function autoSubmit() {
+    form.submit();
+  }
+
+  // Select: chọn là lọc luôn
+  form.querySelectorAll('select').forEach(function (select) {
+    select.addEventListener('change', autoSubmit);
+  });
+
+  // Khoảng điểm: nhập xong đổi giá trị là lọc
+  form.querySelectorAll('input[type="number"]').forEach(function (input) {
+    input.addEventListener('change', autoSubmit);
+  });
+
+  // Ô tên trường: gõ xong 500ms tự lọc
+  const qInput = form.querySelector('input[name="q"]');
+  if (qInput) {
+    qInput.addEventListener('input', function () {
+      clearTimeout(typingTimer);
+      typingTimer = setTimeout(autoSubmit, 500);
+    });
+  }
+});
+</script>
+//fđf
         </form>
       </div>
     </div>

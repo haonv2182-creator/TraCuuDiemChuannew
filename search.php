@@ -375,7 +375,6 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 </script>
-//fđf
         </form>
       </div>
     </div>
@@ -456,7 +455,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <th></th>
               </tr>
             </thead>
-
+//dfsdf
             <tbody>
             <?php foreach($rows as $i=>$r):
               $cls = $r['score']>=27 ? 'sb-hi' : ($r['score']>=23 ? 'sb-mid' : 'sb-lo');

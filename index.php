@@ -10,6 +10,18 @@ $tab    = isset($_GET['major']) ? 'major' : 'uni';
 
 // ── Tất cả ngành (cho dropdown) ──────────────────────────────
 $allMajors = $db->query("SELECT major_id, major_name FROM majors ORDER BY major_name")->fetchAll();
+// Các ngành có nhiều dữ liệu nhất để hiển thị tìm kiếm nhanh
+$popularMajors = $db->query("
+    SELECT 
+        m.major_id,
+        m.major_name,
+        COUNT(s.score_id) AS total_scores
+    FROM majors m
+    LEFT JOIN admission_scores s ON m.major_id = s.major_id
+    GROUP BY m.major_id, m.major_name
+    ORDER BY total_scores DESC, m.major_name ASC
+    LIMIT 5
+")->fetchAll();
 
 // ── Kết quả tìm trường ───────────────────────────────────────
 $uniResults = [];
@@ -91,9 +103,12 @@ if (!$q && !$mid) {
     ")->fetchAll();
 }
 
-$stats = $db->query("SELECT
-    (SELECT COUNT(*) FROM universities) AS unis,
-    (SELECT COUNT(*) FROM admission_scores) AS scores")->fetch();
+$stats = $db->query("
+    SELECT
+        (SELECT COUNT(*) FROM universities) AS unis,
+        (SELECT COUNT(*) FROM majors) AS majors,
+        (SELECT COUNT(*) FROM admission_scores) AS scores
+")->fetch();
 
 function uni_code_box($code, $name, $length = 4) {
     $code = trim((string)$code);
@@ -106,81 +121,307 @@ function uni_code_box($code, $name, $length = 4) {
 ?>
 
 <!-- HERO -->
-<section class="hero">
-  <div class="container">
-    <div class="text-center mb-2">
-      <h1 class="hero-title">Tra cứu điểm chuẩn<br>đại học Việt Nam</h1>
+<section class="hero home-hero">
+  <div class="container position-relative">
+
+    <div class="text-center">
+      <span class="home-hero-label">
+        <i class="bi bi-mortarboard-fill me-1"></i>
+        Dữ liệu tuyển sinh đại học Việt Nam
+      </span>
+
+      <h1 class="hero-title mt-3">
+        Tra cứu điểm chuẩn<br>
+        <span class="home-gradient-text">nhanh chóng và chính xác</span>
+      </h1>
+
       <p class="hero-sub">
-        Tổng hợp dữ liệu tuyển sinh từ <?= $stats['unis'] ?> trường · <?= number_format($stats['scores']) ?> bản ghi
+        Tìm trường, ngành học và phương thức xét tuyển phù hợp với bạn
       </p>
 
-      <!-- Tab chọn kiểu tìm -->
+      <!-- Tab tìm kiếm -->
       <div class="d-flex justify-content-center gap-2 mb-3">
-        <button onclick="switchTab('uni')" id="tab-uni"
-                class="btn fw-semibold px-4 <?= $tab==='uni'?'btn-light':'btn-outline-light' ?>"
+        <button type="button"
+                onclick="switchTab('uni')"
+                id="tab-uni"
+                class="btn fw-semibold px-4 <?= $tab === 'uni' ? 'btn-light' : 'btn-outline-light' ?>"
                 style="border-radius:30px">
-          <i class="bi bi-building me-1"></i>Tìm theo trường
+          <i class="bi bi-building me-1"></i>
+          Tìm theo trường
         </button>
 
-        <button onclick="switchTab('major')" id="tab-major"
-                class="btn fw-semibold px-4 <?= $tab==='major'?'btn-light':'btn-outline-light' ?>"
+        <button type="button"
+                onclick="switchTab('major')"
+                id="tab-major"
+                class="btn fw-semibold px-4 <?= $tab === 'major' ? 'btn-light' : 'btn-outline-light' ?>"
                 style="border-radius:30px">
-          <i class="bi bi-book me-1"></i>Tìm theo ngành
+          <i class="bi bi-book me-1"></i>
+          Tìm theo ngành
         </button>
       </div>
 
       <!-- Form tìm trường -->
-      <form action="<?= url('index.php') ?>" method="GET" id="form-uni"
-            class="<?= $tab==='major'?'d-none':'' ?>">
-        <div class="search-hero mx-auto" style="max-width:580px">
+      <form action="<?= url('index.php') ?>"
+            method="GET"
+            id="form-uni"
+            class="js-home-search-form <?= $tab === 'major' ? 'd-none' : '' ?>">
+
+        <div class="search-hero mx-auto" style="max-width:650px">
           <i class="bi bi-building"></i>
-          <input type="text" name="q" value="<?= e($q) ?>"
+
+          <input type="text"
+                 name="q"
+                 id="heroUniversityInput"
+                 value="<?= e($q) ?>"
+                 autocomplete="off"
                  placeholder="Nhập tên trường đại học...">
-          <button type="submit" class="btn btn-primary px-4 fw-semibold">Tìm kiếm</button>
+
+          <button type="submit"
+                  class="btn btn-primary px-4 fw-semibold js-submit-btn">
+            <i class="bi bi-search me-1"></i>
+            Tìm kiếm
+          </button>
         </div>
       </form>
 
       <!-- Form tìm ngành -->
-      <form action="<?= url('index.php') ?>" method="GET" id="form-major"
-            class="<?= $tab==='uni'?'d-none':'' ?>">
-        <div class="search-hero mx-auto" style="max-width:820px">
+      <form action="<?= url('index.php') ?>"
+            method="GET"
+            id="form-major"
+            class="js-home-search-form <?= $tab === 'uni' ? 'd-none' : '' ?>">
+
+        <div class="search-hero mx-auto" style="max-width:850px">
           <i class="bi bi-book"></i>
 
           <select name="major"
+                  id="heroMajorSelect"
                   class="form-select border-0 bg-transparent"
                   style="flex:1;outline:none;font-size:14px;font-family:inherit"
                   onchange="this.form.submit()">
+
             <option value="0">-- Chọn ngành học --</option>
-            <?php foreach($allMajors as $m): ?>
-            <option value="<?= $m['major_id'] ?>" <?= $mid==$m['major_id']?'selected':'' ?>>
-              <?= e($m['major_name']) ?>
-            </option>
+
+            <?php foreach ($allMajors as $m): ?>
+              <option value="<?= $m['major_id'] ?>"
+                      <?= $mid == $m['major_id'] ? 'selected' : '' ?>>
+                <?= e($m['major_name']) ?>
+              </option>
             <?php endforeach; ?>
           </select>
 
           <select name="method"
                   class="form-select border-0 bg-transparent"
-                  style="max-width:190px;outline:none;font-size:14px;font-family:inherit;border-left:1px solid var(--gray-200)!important"
+                  style="max-width:200px;
+                         outline:none;
+                         font-size:14px;
+                         font-family:inherit;
+                         border-left:1px solid var(--gray-200)!important"
                   onchange="this.form.submit()">
+
             <option value="">Tất cả phương thức</option>
-            <option value="THPT" <?= $method==='THPT'?'selected':'' ?>>Thi THPT</option>
-            <option value="HocBa" <?= $method==='HocBa'?'selected':'' ?>>Học bạ</option>
-            <option value="TongHop" <?= $method==='TongHop'?'selected':'' ?>>Tổng hợp</option>
-            <option value="DGNL" <?= $method==='DGNL'?'selected':'' ?>>Đánh giá NL</option>
-            <option value="Thang" <?= $method==='Thang'?'selected':'' ?>>Xét thẳng</option>
+
+            <option value="THPT" <?= $method === 'THPT' ? 'selected' : '' ?>>
+              Thi THPT
+            </option>
+
+            <option value="HocBa" <?= $method === 'HocBa' ? 'selected' : '' ?>>
+              Học bạ
+            </option>
+
+            <option value="TongHop" <?= $method === 'TongHop' ? 'selected' : '' ?>>
+              Tổng hợp
+            </option>
+
+            <option value="DGNL" <?= $method === 'DGNL' ? 'selected' : '' ?>>
+              Đánh giá NL
+            </option>
+
+            <option value="Thang" <?= $method === 'Thang' ? 'selected' : '' ?>>
+              Xét thẳng
+            </option>
           </select>
 
-          <button type="submit" class="btn btn-primary px-4 fw-semibold">
+          <button type="submit"
+                  class="btn btn-primary px-4 fw-semibold js-submit-btn">
+            <i class="bi bi-search me-1"></i>
             Xem điểm
           </button>
         </div>
       </form>
+
+      <!-- Ngành tìm nhanh -->
+      <?php if (!empty($popularMajors)): ?>
+      <div class="popular-searches">
+        <span class="popular-searches-label">Tìm nhanh:</span>
+
+        <?php foreach ($popularMajors as $m): ?>
+          <button type="button"
+                  class="popular-search-btn"
+                  data-major-id="<?= $m['major_id'] ?>">
+            <?= e($m['major_name']) ?>
+          </button>
+        <?php endforeach; ?>
+      </div>
+      <?php endif; ?>
+
+      <!-- Thống kê -->
+      <div class="home-hero-stats">
+
+        <div class="home-hero-stat">
+          <div class="home-stat-icon">
+            <i class="bi bi-building"></i>
+          </div>
+
+          <div>
+            <strong data-counter="<?= (int)$stats['unis'] ?>">
+              <?= number_format($stats['unis']) ?>
+            </strong>
+            <span>Trường đại học</span>
+          </div>
+        </div>
+
+        <div class="home-hero-stat">
+          <div class="home-stat-icon">
+            <i class="bi bi-book"></i>
+          </div>
+
+          <div>
+            <strong data-counter="<?= (int)$stats['majors'] ?>">
+              <?= number_format($stats['majors']) ?>
+            </strong>
+            <span>Ngành học</span>
+          </div>
+        </div>
+
+        <div class="home-hero-stat">
+          <div class="home-stat-icon">
+            <i class="bi bi-graph-up-arrow"></i>
+          </div>
+
+          <div>
+            <strong data-counter="<?= (int)$stats['scores'] ?>">
+              <?= number_format($stats['scores']) ?>
+            </strong>
+            <span>Dữ liệu điểm chuẩn</span>
+          </div>
+        </div>
+
+      </div>
 
     </div>
   </div>
 </section>
 
 <div class="container py-5">
+  <!-- Chức năng nhanh -->
+<section class="mb-5">
+  <div class="section-heading text-center mb-4">
+    <span class="section-label">Khám phá hệ thống</span>
+    <h3 class="fw-bold mt-2 mb-2">Bạn đang cần tìm gì?</h3>
+    <p class="text-muted mb-0">
+      Sử dụng các công cụ hỗ trợ tra cứu và lựa chọn trường đại học
+    </p>
+  </div>
+
+  <div class="row g-3">
+
+    <div class="col-md-4 reveal-up">
+      <a href="<?= url('search.php') ?>"
+         class="home-action-card text-decoration-none">
+
+        <div class="home-action-icon action-search">
+          <i class="bi bi-search"></i>
+        </div>
+
+        <div>
+          <h5>Tra cứu điểm chuẩn</h5>
+          <p>
+            Tìm điểm theo trường, ngành, tổ hợp, năm và phương thức xét tuyển.
+          </p>
+
+          <span class="home-action-link">
+            Tra cứu ngay
+            <i class="bi bi-arrow-right"></i>
+          </span>
+        </div>
+      </a>
+    </div>
+
+    <div class="col-md-4 reveal-up">
+      <a href="<?= url('compare.php') ?>"
+         class="home-action-card text-decoration-none">
+
+        <div class="home-action-icon action-compare">
+          <i class="bi bi-bar-chart-line"></i>
+        </div>
+
+        <div>
+          <h5>So sánh trường</h5>
+          <p>
+            So sánh điểm chuẩn giữa hai trường qua từng năm và từng ngành.
+          </p>
+
+          <span class="home-action-link">
+            So sánh ngay
+            <i class="bi bi-arrow-right"></i>
+          </span>
+        </div>
+      </a>
+    </div>
+
+    <div class="col-md-4 reveal-up">
+      <a href="<?= url('ai_recommend.php') ?>"
+         class="home-action-card text-decoration-none">
+
+        <div class="home-action-icon action-ai">
+          <i class="bi bi-stars"></i>
+        </div>
+
+        <div>
+          <h5>Gợi ý trường phù hợp</h5>
+          <p>
+            Nhập điểm của bạn để nhận gợi ý ngành và trường phù hợp.
+          </p>
+
+          <span class="home-action-link">
+            Nhận gợi ý
+            <i class="bi bi-arrow-right"></i>
+          </span>
+        </div>
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<!-- Lịch sử tìm kiếm -->
+<section id="recentSearchesWrap"
+         class="recent-search-section mb-5 d-none reveal-up">
+
+  <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+    <div>
+      <h5 class="fw-bold mb-1">
+        <i class="bi bi-clock-history text-primary me-2"></i>
+        Tìm kiếm gần đây
+      </h5>
+
+      <p class="text-muted small mb-0">
+        Nhấn vào một mục để tìm lại nhanh chóng
+      </p>
+    </div>
+
+    <button type="button"
+            id="clearRecentSearches"
+            class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-trash3 me-1"></i>
+      Xóa lịch sử
+    </button>
+  </div>
+
+  <div id="recentSearchList"
+       class="d-flex flex-wrap gap-2">
+  </div>
+</section>
 
 <?php if ($mid && $majorName): ?>
 <!-- ══ KẾT QUẢ TÌM THEO NGÀNH ══ -->

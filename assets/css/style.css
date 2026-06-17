@@ -183,3 +183,338 @@ code{ background:var(--gray-100); padding:2px 6px; border-radius:5px; font-size:
   .admin-sidebar { display:none; }
   .admin-content { padding:14px; }
 }
+/* ============================================================
+   TRANG CHỦ NÂNG CẤP
+   ============================================================ */
+
+.home-hero {
+  padding-top: 68px;
+  padding-bottom: 60px;
+}
+
+.home-hero::after {
+  content: '';
+  position: absolute;
+  left: -120px;
+  bottom: -180px;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .05);
+}
+
+.home-hero-label {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border: 1px solid rgba(255, 255, 255, .22);
+  background: rgba(255, 255, 255, .1);
+  backdrop-filter: blur(8px);
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.home-gradient-text {
+  color: #dbeafe;
+}
+
+.popular-searches {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.popular-searches-label {
+  font-size: 12px;
+  opacity: .75;
+}
+
+.popular-search-btn {
+  border: 1px solid rgba(255, 255, 255, .25);
+  background: rgba(255, 255, 255, .1);
+  color: #fff;
+  padding: 5px 11px;
+  border-radius: 30px;
+  font-family: inherit;
+  font-size: 11px;
+  transition: all .2s ease;
+}
+
+.popular-search-btn:hover {
+  background: #fff;
+  color: var(--primary);
+  border-color: #fff;
+  transform: translateY(-2px);
+}
+
+.home-hero-stats {
+  max-width: 800px;
+  margin: 30px auto 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.home-hero-stat {
+  display: flex;
+  align-items: center;
+  text-align: left;
+  gap: 12px;
+  padding: 14px 18px;
+  border: 1px solid rgba(255, 255, 255, .16);
+  background: rgba(255, 255, 255, .09);
+  backdrop-filter: blur(8px);
+  border-radius: 14px;
+}
+
+.home-stat-icon {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, .14);
+  font-size: 17px;
+}
+
+.home-hero-stat strong {
+  display: block;
+  font-size: 21px;
+  line-height: 1.2;
+}
+
+.home-hero-stat span {
+  display: block;
+  margin-top: 2px;
+  font-size: 10px;
+  opacity: .76;
+}
+
+.section-heading {
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.section-label {
+  display: inline-block;
+  color: var(--primary);
+  background: var(--primary-lt);
+  border-radius: 30px;
+  padding: 5px 13px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+}
+
+.home-action-card {
+  height: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 17px;
+  padding: 24px;
+  color: var(--gray-800);
+  background: #fff;
+  border: 1px solid var(--gray-200);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  transition: all .25s ease;
+}
+
+.home-action-card:hover {
+  color: var(--gray-800);
+  border-color: var(--primary);
+  box-shadow: 0 12px 32px rgba(26, 86, 219, .13);
+  transform: translateY(-5px);
+}
+
+.home-action-icon {
+  width: 54px;
+  height: 54px;
+  flex-shrink: 0;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 23px;
+}
+
+.action-search {
+  color: #1a56db;
+  background: #e8f0fe;
+}
+
+.action-compare {
+  color: #7c3aed;
+  background: #ede9fe;
+}
+
+.action-ai {
+  color: #d97706;
+  background: #fef3c7;
+}
+
+.home-action-card h5 {
+  color: var(--gray-800);
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 7px;
+}
+
+.home-action-card p {
+  color: var(--gray-600);
+  font-size: 12px;
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+.home-action-link {
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.home-action-link i {
+  transition: transform .2s ease;
+}
+
+.home-action-card:hover .home-action-link i {
+  transform: translateX(4px);
+}
+
+.recent-search-section {
+  padding: 22px;
+  background: #fff;
+  border: 1px solid var(--gray-200);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+}
+
+.recent-search-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--gray-200);
+  background: var(--gray-50);
+  color: var(--gray-600);
+  padding: 7px 13px;
+  border-radius: 30px;
+  font-family: inherit;
+  font-size: 12px;
+  transition: all .2s ease;
+}
+
+.recent-search-chip:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-lt);
+  transform: translateY(-2px);
+}
+
+/* Hiệu ứng xuất hiện khi cuộn */
+.reveal-pending {
+  opacity: 0;
+  transform: translateY(25px);
+  transition:
+    opacity .55s ease,
+    transform .55s ease;
+}
+
+.reveal-pending.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Nút đang tải */
+.js-submit-btn.is-loading {
+  pointer-events: none;
+  opacity: .85;
+}
+
+/* Dark mode */
+[data-theme="dark"] .home-action-card,
+[data-theme="dark"] .recent-search-section {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .home-action-card h5 {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .recent-search-chip {
+  color: #cbd5e1;
+  background: #0f172a;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .recent-search-chip:hover {
+  color: #93c5fd;
+  background: #1e3a5f;
+  border-color: #3b82f6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .home-hero {
+    padding-top: 42px;
+    padding-bottom: 42px;
+  }
+
+  .home-hero-stats {
+    grid-template-columns: 1fr;
+    max-width: 380px;
+  }
+
+  .home-hero-stat {
+    justify-content: flex-start;
+  }
+
+  .popular-searches {
+    padding: 0 12px;
+  }
+
+  .home-action-card {
+    padding: 20px;
+  }
+
+  .recent-search-section {
+    padding: 18px;
+  }
+}
+
+@media (max-width: 576px) {
+  .search-hero {
+    flex-wrap: wrap;
+    padding: 10px;
+  }
+
+  .search-hero input {
+    min-width: calc(100% - 30px);
+  }
+
+  .search-hero select {
+    width: 100% !important;
+    max-width: none !important;
+    border-left: 0 !important;
+  }
+
+  .search-hero .btn {
+    width: 100%;
+  }
+
+  .home-hero-label {
+    font-size: 10px;
+  }
+
+  .popular-searches-label {
+    width: 100%;
+  }
+}

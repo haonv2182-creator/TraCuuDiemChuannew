@@ -1,4 +1,4 @@
-```php
+
 <?php
 $pageTitle = 'Tra cứu điểm chuẩn – DiemChuan.vn';
 require_once 'includes/header.php';
@@ -455,7 +455,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 <th></th>
               </tr>
             </thead>
-//dfsdf
             <tbody>
             <?php foreach($rows as $i=>$r):
               $cls = $r['score']>=27 ? 'sb-hi' : ($r['score']>=23 ? 'sb-mid' : 'sb-lo');
@@ -596,4 +595,4 @@ document.addEventListener('DOMContentLoaded', function () {
 </div>
 
 <?php require_once 'includes/footer.php'; ?>
-```
+

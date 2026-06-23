@@ -103,6 +103,24 @@ if (!$q && !$mid) {
     ")->fetchAll();
 }
 
+// ── Ngành nổi bật ─────────────────────────────────────────────
+$featuredMajors = [];
+
+if (!$q && !$mid) {
+    $featuredMajors = $db->query("
+        SELECT
+            m.major_id,
+            m.major_name,
+            COUNT(DISTINCT s.university_id) AS university_count,
+            MAX(s.score) AS top_score
+        FROM majors m
+        LEFT JOIN admission_scores s ON m.major_id = s.major_id
+        GROUP BY m.major_id, m.major_name
+        ORDER BY university_count DESC, top_score DESC, m.major_name ASC
+        LIMIT 8
+    ")->fetchAll();
+}
+
 $stats = $db->query("
     SELECT
         (SELECT COUNT(*) FROM universities) AS unis,
@@ -142,7 +160,7 @@ function uni_code_box($code, $name, $length = 4) {
       <!-- Tab tìm kiếm -->
       <div class="d-flex justify-content-center gap-2 mb-3">
         <button type="button"
-                onclick="switchTab('uni')"
+                onclick="switchHomeTab('uni')"
                 id="tab-uni"
                 class="btn fw-semibold px-4 <?= $tab === 'uni' ? 'btn-light' : 'btn-outline-light' ?>"
                 style="border-radius:30px">
@@ -151,7 +169,7 @@ function uni_code_box($code, $name, $length = 4) {
         </button>
 
         <button type="button"
-                onclick="switchTab('major')"
+                onclick="switchHomeTab('major')"
                 id="tab-major"
                 class="btn fw-semibold px-4 <?= $tab === 'major' ? 'btn-light' : 'btn-outline-light' ?>"
                 style="border-radius:30px">
@@ -634,7 +652,11 @@ function uni_code_box($code, $name, $length = 4) {
   <?php endif; ?>
 
 <?php else: ?>
+
 <!-- ══ TRANG CHỦ: TRƯỜNG NỔI BẬT ══ -->
+<div id="featured-universities"
+     class="<?= $tab === 'major' ? 'd-none' : '' ?>">
+
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
       <h4 class="fw-bold mb-1">
@@ -655,6 +677,7 @@ function uni_code_box($code, $name, $length = 4) {
     <div class="col-6 col-md-4 col-lg-3">
       <a href="<?= url('university.php?id='.$u['university_id']) ?>"
          class="uni-card h-100 text-decoration-none">
+
         <div class="d-flex align-items-center gap-3 mb-3">
           <div class="uni-logo flex-shrink-0 d-flex align-items-center justify-content-center"
                style="width:48px;height:48px;font-size:12px;font-weight:700">
@@ -686,32 +709,109 @@ function uni_code_box($code, $name, $length = 4) {
     </div>
     <?php endforeach; ?>
   </div>
+</div>
+
+<!-- ══ TRANG CHỦ: NGÀNH NỔI BẬT ══ -->
+<div id="featured-majors"
+     class="<?= $tab === 'major' ? '' : 'd-none' ?>">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="fw-bold mb-1">
+        <i class="bi bi-book me-2 text-primary"></i>Ngành học nổi bật
+      </h4>
+      <p class="text-muted small mb-0">
+        <?= count($featuredMajors) ?> ngành có nhiều dữ liệu tuyển sinh · Nhấn để xem điểm chuẩn
+      </p>
+    </div>
+
+    <a href="<?= url('search.php') ?>" class="btn btn-outline-primary btn-sm">
+      Xem tất cả <i class="bi bi-arrow-right ms-1"></i>
+    </a>
+  </div>
+
+  <div class="row g-3">
+    <?php foreach($featuredMajors as $m): ?>
+    <div class="col-6 col-md-4 col-lg-3">
+      <a href="<?= url('index.php?major='.$m['major_id']) ?>"
+         class="uni-card h-100 text-decoration-none">
+
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="uni-logo flex-shrink-0 d-flex align-items-center justify-content-center"
+               style="width:48px;height:48px;font-size:20px">
+            <i class="bi bi-book"></i>
+          </div>
+
+          <div class="overflow-hidden">
+            <div class="fw-bold text-dark" style="font-size:13px;line-height:1.3">
+              <?= e($m['major_name']) ?>
+            </div>
+            <div class="text-muted" style="font-size:11px">
+              <i class="bi bi-building me-1"></i>
+              <?= (int)$m['university_count'] ?> trường đào tạo
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 flex-wrap">
+          <span class="chip">
+            <?= (int)$m['university_count'] ?> trường
+          </span>
+
+          <?php if($m['top_score'] !== null): ?>
+          <span class="score-badge sb-hi fw-bold">
+            <i class="bi bi-star-fill me-1" style="font-size:10px"></i>
+            Cao nhất <?= number_format($m['top_score'],2) ?>
+          </span>
+          <?php endif; ?>
+        </div>
+      </a>
+    </div>
+    <?php endforeach; ?>
+  </div>
+</div>
 <?php endif; ?>
 
 </div>
 
 <script>
-function switchTab(tab) {
+function switchHomeTab(tab) {
   const formUni   = document.getElementById('form-uni');
   const formMajor = document.getElementById('form-major');
   const tabUni    = document.getElementById('tab-uni');
   const tabMajor  = document.getElementById('tab-major');
 
+  const featuredUniversities =
+    document.getElementById('featured-universities');
+
+  const featuredMajors =
+    document.getElementById('featured-majors');
+
   if (tab === 'uni') {
     formUni.classList.remove('d-none');
     formMajor.classList.add('d-none');
+
     tabUni.classList.replace('btn-outline-light','btn-light');
     tabMajor.classList.replace('btn-light','btn-outline-light');
+
+    featuredUniversities?.classList.remove('d-none');
+    featuredMajors?.classList.add('d-none');
   } else {
     formMajor.classList.remove('d-none');
     formUni.classList.add('d-none');
+
     tabMajor.classList.replace('btn-outline-light','btn-light');
     tabUni.classList.replace('btn-light','btn-outline-light');
+
+    featuredMajors?.classList.remove('d-none');
+    featuredUniversities?.classList.add('d-none');
   }
 }
 
+window.switchHomeTab = switchHomeTab;
+
 // Tự mở đúng tab khi có kết quả ngành
-<?php if($mid): ?> switchTab('major'); <?php endif; ?>
+<?php if($mid): ?> switchHomeTab('major'); <?php endif; ?>
 </script>
 
 <?php require_once 'includes/footer.php'; ?>

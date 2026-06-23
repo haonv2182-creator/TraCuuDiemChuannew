@@ -518,3 +518,73 @@ code{ background:var(--gray-100); padding:2px 6px; border-radius:5px; font-size:
     width: 100%;
   }
 }
+/* ============================================================
+   FIX MÀU CHỮ CHẾ ĐỘ TỐI TRANG CHỦ
+   ============================================================ */
+
+[data-theme="dark"] .text-dark {
+  color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .text-muted {
+  color: #94a3b8 !important;
+}
+
+/* Thẻ trường và ngành nổi bật */
+[data-theme="dark"] .uni-card,
+[data-theme="dark"] .uni-card:hover {
+  color: #e2e8f0 !important;
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .uni-card .fw-bold {
+  color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .uni-card .text-muted {
+  color: #94a3b8 !important;
+}
+
+/* Tiêu đề và mô tả các khu vực */
+[data-theme="dark"] .section-heading h3,
+[data-theme="dark"] .section-heading h4 {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .section-heading p {
+  color: #94a3b8 !important;
+}
+
+/* Khối Bạn đang cần tìm gì */
+[data-theme="dark"] .home-action-card,
+[data-theme="dark"] .home-action-card:hover {
+  color: #e2e8f0 !important;
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .home-action-card h5 {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .home-action-card p {
+  color: #94a3b8 !important;
+}
+
+/* Phần tiêu đề trường/ngành nổi bật */
+[data-theme="dark"] #featured-universities h4,
+[data-theme="dark"] #featured-majors h4 {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] #featured-universities p,
+[data-theme="dark"] #featured-majors p {
+  color: #94a3b8 !important;
+}
+
+/* Icon ngành/trường */
+[data-theme="dark"] .uni-logo {
+  background: #1e3a5f;
+  color: #60a5fa;
+}x  

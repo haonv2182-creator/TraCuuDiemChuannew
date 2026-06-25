@@ -1,27 +1,34 @@
+
 <?php
 $pageTitle = 'Gợi ý theo điểm – DiemChuan.vn';
 require_once 'includes/header.php';
 
 $db = getDB();
 
-/**
- * Đổi mã phương thức thành tên dễ đọc.
- */
 function recommend_method_label(string $method): string
 {
     $labels = [
         'THPT'    => 'Thi THPT',
         'HocBa'   => 'Học bạ',
         'TongHop' => 'Tổng hợp',
-        'DGNL'    => 'Đánh giá năng lực',
+        'DGNL'    => 'Đánh giá năng lực'
     ];
 
     return $labels[$method] ?? $method;
 }
 
-/**
- * Tìm tên ngành theo ID.
- */
+function recommend_method_color(string $method): string
+{
+    $colors = [
+        'THPT'    => 'primary',
+        'HocBa'   => 'success',
+        'TongHop' => 'warning',
+        'DGNL'    => 'info'
+    ];
+
+    return $colors[$method] ?? 'secondary';
+}
+
 function recommend_major_name(array $majors, int $majorId): string
 {
     foreach ($majors as $major) {
@@ -33,9 +40,6 @@ function recommend_major_name(array $majors, int $majorId): string
     return '';
 }
 
-/**
- * Lấy dữ liệu gợi ý mới nhất và chia thành ba nhóm.
- */
 function recommend_by_score(
     float $userScore,
     string $method,
@@ -53,7 +57,8 @@ function recommend_by_score(
               AND s2.major_id = s.major_id
               AND COALESCE(s2.method, '') = COALESCE(s.method, '')
               AND COALESCE(s2.combination, '') = COALESCE(s.combination, '')
-        )"
+        )",
+        "s.method <> 'Thang'"
     ];
 
     $params = [];
@@ -89,8 +94,7 @@ function recommend_by_score(
             s.year,
             s.combination,
             s.method,
-            s.score AS cutoff,
-            s.quota
+            s.score AS cutoff
         FROM admission_scores s
         JOIN universities u
           ON s.university_id = u.university_id
@@ -136,12 +140,12 @@ function recommend_by_score(
     return $groups;
 }
 
-// ── Dữ liệu cho form ─────────────────────────────────────────
 $combinations = $db->query("
     SELECT DISTINCT combination
     FROM admission_scores
     WHERE combination IS NOT NULL
       AND TRIM(combination) <> ''
+      AND method <> 'Thang'
     ORDER BY combination
 ")->fetchAll(PDO::FETCH_COLUMN);
 
@@ -150,6 +154,7 @@ $methods = $db->query("
     FROM admission_scores
     WHERE method IS NOT NULL
       AND TRIM(method) <> ''
+      AND method <> 'Thang'
     ORDER BY method
 ")->fetchAll(PDO::FETCH_COLUMN);
 
@@ -161,12 +166,11 @@ $majors = $db->query("
 
 $provinces = getProvinces();
 
-// ── Giá trị form ──────────────────────────────────────────────
-$score       = (float)($_GET['score'] ?? 0);
-$method      = trim((string)($_GET['method'] ?? ''));
-$combination = trim((string)($_GET['combination'] ?? ''));
+$score       = 0;
+$method      = '';
+$combination = '';
 $province    = trim((string)($_GET['province'] ?? ''));
-$majorId     = (int)($_GET['major_id'] ?? 0);
+$majorId     = 0;
 $error       = '';
 $result      = null;
 
@@ -178,14 +182,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $majorId     = (int)($_POST['major_id'] ?? 0);
 
     if ($method === '') {
-        $error = 'Vui lòng chọn phương thức xét tuyển để xác định đúng thang điểm.';
+        $error = 'Vui lòng chọn phương thức xét tuyển.';
     } elseif ($score <= 0) {
         $error = 'Điểm nhập vào phải lớn hơn 0.';
     } elseif ($method === 'DGNL' && $score > 1200) {
         $error = 'Điểm đánh giá năng lực phải nằm trong khoảng từ 1 đến 1200.';
     } elseif ($method !== 'DGNL' && $score > 30) {
         $error = 'Điểm theo thang 30 phải nằm trong khoảng từ 1 đến 30.';
-    } elseif (!in_array($method, ['DGNL', 'Thang'], true) && $combination === '') {
+    } elseif ($method !== 'DGNL' && $combination === '') {
         $error = 'Vui lòng chọn tổ hợp xét tuyển.';
     } else {
         $result = recommend_by_score(
@@ -196,7 +200,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $majorId
         );
 
-        // Lưu lịch sử nếu bảng ai_logs đang tồn tại.
         try {
             $db->prepare("
                 INSERT INTO ai_logs (
@@ -214,7 +217,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SERVER['REMOTE_ADDR'] ?? ''
             ]);
         } catch (PDOException $exception) {
-            // Không làm gián đoạn trang nếu bảng log chưa tồn tại.
+            // Bỏ qua nếu bảng log chưa tồn tại
         }
     }
 }
@@ -223,431 +226,392 @@ $majorName = recommend_major_name($majors, $majorId);
 ?>
 
 <div class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-xl-10">
+    <div class="row justify-content-center">
+        <div class="col-xl-10">
 
-      <!-- GIỚI THIỆU -->
-      <div class="text-center mb-4">
-        <span class="section-label">
-          Gợi ý tham khảo
-        </span>
+            <div class="text-center mb-4">
+                <span class="section-label">Gợi ý tham khảo</span>
 
-        <h2 class="fw-bold mt-2 mb-2">
-          <i class="bi bi-stars text-primary me-2"></i>
-          Gợi ý trường theo điểm
-        </h2>
+                <h2 class="fw-bold mt-2 mb-2">
+                    <i class="bi bi-stars text-primary me-2"></i>
+                    Gợi ý trường theo điểm
+                </h2>
 
-        <p class="text-muted mb-0">
-          Nhập điểm và tiêu chí của bạn để xem các lựa chọn an toàn, phù hợp và thử sức
-        </p>
-      </div>
-
-      <!-- FORM -->
-      <div class="card shadow-sm mb-4">
-        <div class="card-body p-4">
-
-          <?php if ($error !== ''): ?>
-            <div class="alert alert-danger small py-2">
-              <i class="bi bi-exclamation-triangle me-1"></i>
-              <?= e($error) ?>
+                <p class="text-muted mb-0">
+                    Nhập điểm và tiêu chí của bạn để xem các lựa chọn an toàn, phù hợp và thử sức
+                </p>
             </div>
-          <?php endif; ?>
 
-          <form method="POST" id="recommendForm">
-            <div class="row g-3 align-items-end">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body p-4">
 
-              <!-- Phương thức -->
-              <div class="col-md-4">
-                <label class="form-label fw-semibold small">
-                  Phương thức xét tuyển
-                  <span class="text-danger">*</span>
-                </label>
-
-                <select
-                  name="method"
-                  id="methodSelect"
-                  class="form-select"
-                  required
-                >
-                  <option value="">-- Chọn phương thức --</option>
-
-                  <?php foreach ($methods as $methodValue): ?>
-                    <option
-                      value="<?= e($methodValue) ?>"
-                      <?= $method === $methodValue ? 'selected' : '' ?>
-                    >
-                      <?= e(recommend_method_label($methodValue)) ?>
-                    </option>
-                  <?php endforeach; ?>
-                </select>
-              </div>
-
-              <!-- Điểm -->
-              <div class="col-md-4">
-                <label class="form-label fw-semibold small">
-                  Điểm của bạn
-                  <span class="text-danger">*</span>
-                </label>
-
-                <input
-                  type="number"
-                  name="score"
-                  id="scoreInput"
-                  class="form-control"
-                  placeholder="Ví dụ: 24.5"
-                  step="0.01"
-                  min="0"
-                  max="1200"
-                  value="<?= $score > 0 ? e($score) : '' ?>"
-                  required
-                >
-
-                <small id="scoreHelp" class="text-muted">
-                  Chọn phương thức để xác định thang điểm
-                </small>
-              </div>
-
-              <!-- Tổ hợp -->
-              <div class="col-md-4">
-                <label class="form-label fw-semibold small">
-                  Tổ hợp xét tuyển
-                  <span id="combinationRequired" class="text-danger">*</span>
-                </label>
-
-                <select
-                  name="combination"
-                  id="combinationSelect"
-                  class="form-select"
-                >
-                  <option value="">-- Chọn tổ hợp --</option>
-
-                  <?php foreach ($combinations as $combinationValue): ?>
-                    <option
-                      value="<?= e($combinationValue) ?>"
-                      <?= $combination === $combinationValue ? 'selected' : '' ?>
-                    >
-                      <?= e($combinationValue) ?>
-                    </option>
-                  <?php endforeach; ?>
-                </select>
-
-                <small id="combinationHelp" class="text-muted d-none">
-                  Phương thức này không bắt buộc chọn tổ hợp
-                </small>
-              </div>
-
-              <!-- Ngành -->
-              <div class="col-md-6">
-                <label class="form-label fw-semibold small">
-                  Ngành muốn học
-                  <span class="text-muted fw-normal">(không bắt buộc)</span>
-                </label>
-
-                <select name="major_id" class="form-select">
-                  <option value="0">Tất cả ngành</option>
-
-                  <?php foreach ($majors as $major): ?>
-                    <option
-                      value="<?= (int)$major['major_id'] ?>"
-                      <?= $majorId === (int)$major['major_id'] ? 'selected' : '' ?>
-                    >
-                      <?= e($major['major_name']) ?>
-                    </option>
-                  <?php endforeach; ?>
-                </select>
-              </div>
-
-              <!-- Tỉnh thành -->
-              <div class="col-md-6">
-                <label class="form-label fw-semibold small">
-                  Tỉnh/Thành phố
-                  <span class="text-muted fw-normal">(không bắt buộc)</span>
-                </label>
-
-                <select name="province" class="form-select">
-                  <option value="">Tất cả tỉnh thành</option>
-
-                  <?php foreach ($provinces as $provinceValue): ?>
-                    <option
-                      value="<?= e($provinceValue) ?>"
-                      <?= $province === $provinceValue ? 'selected' : '' ?>
-                    >
-                      <?= e($provinceValue) ?>
-                    </option>
-                  <?php endforeach; ?>
-                </select>
-              </div>
-
-              <div class="col-12">
-                <button
-                  type="submit"
-                  class="btn btn-primary w-100 fw-semibold py-2"
-                >
-                  <i class="bi bi-stars me-2"></i>
-                  Xem gợi ý phù hợp
-                </button>
-              </div>
-
-            </div>
-          </form>
-
-          <div class="alert alert-light border small text-muted mt-3 mb-0">
-            <i class="bi bi-info-circle me-1"></i>
-            Kết quả dựa trên dữ liệu điểm chuẩn gần nhất và chỉ mang tính tham khảo,
-            không phải dự đoán chắc chắn kết quả trúng tuyển.
-          </div>
-
-        </div>
-      </div>
-
-      <!-- KẾT QUẢ -->
-      <?php if ($result !== null): ?>
-        <?php
-        $groupSettings = [
-            'safe' => [
-                'title'       => 'AN TOÀN',
-                'description' => $method === 'DGNL'
-                    ? 'Điểm của bạn cao hơn điểm chuẩn từ 50 điểm trở lên'
-                    : 'Điểm của bạn cao hơn điểm chuẩn từ 1,5 điểm trở lên',
-                'icon'        => 'bi-shield-check',
-                'class'       => 'success'
-            ],
-            'fit' => [
-                'title'       => 'PHÙ HỢP',
-                'description' => $method === 'DGNL'
-                    ? 'Điểm của bạn nằm trong khoảng ±50 điểm so với điểm chuẩn'
-                    : 'Điểm của bạn nằm trong khoảng gần điểm chuẩn',
-                'icon'        => 'bi-check-circle',
-                'class'       => 'primary'
-            ],
-            'try' => [
-                'title'       => 'THỬ SỨC',
-                'description' => $method === 'DGNL'
-                    ? 'Điểm của bạn thấp hơn điểm chuẩn tối đa 120 điểm'
-                    : 'Điểm của bạn thấp hơn điểm chuẩn tối đa 2 điểm',
-                'icon'        => 'bi-lightning-charge',
-                'class'       => 'warning'
-            ]
-        ];
-
-        $totalResults =
-            count($result['safe'])
-            + count($result['fit'])
-            + count($result['try']);
-        ?>
-
-        <div class="card shadow-sm mb-4">
-          <div class="card-header d-flex flex-wrap align-items-center gap-2">
-            <span class="fw-semibold">
-              <i class="bi bi-list-check text-primary me-1"></i>
-              Kết quả gợi ý
-            </span>
-
-            <span class="chip">
-              Điểm: <?= number_format($score, 2) ?>
-            </span>
-
-            <span class="chip">
-              <?= e(recommend_method_label($method)) ?>
-            </span>
-
-            <?php if ($combination !== ''): ?>
-              <span class="chip">
-                Tổ hợp: <?= e($combination) ?>
-              </span>
-            <?php endif; ?>
-
-            <?php if ($majorName !== ''): ?>
-              <span class="chip">
-                Ngành: <?= e($majorName) ?>
-              </span>
-            <?php endif; ?>
-
-            <?php if ($province !== ''): ?>
-              <span class="chip">
-                <?= e($province) ?>
-              </span>
-            <?php endif; ?>
-
-            <strong class="text-primary ms-auto">
-              <?= number_format($totalResults) ?> kết quả
-            </strong>
-          </div>
-        </div>
-
-        <?php if ($totalResults === 0): ?>
-          <div class="text-center py-5 text-muted">
-            <i
-              class="bi bi-inbox"
-              style="display:block;font-size:48px;margin-bottom:12px"
-            ></i>
-
-            <h5>Chưa tìm thấy lựa chọn phù hợp</h5>
-
-            <p class="small mb-0">
-              Thử bỏ bớt bộ lọc ngành hoặc tỉnh/thành để mở rộng kết quả.
-            </p>
-          </div>
-        <?php else: ?>
-
-          <?php foreach ($groupSettings as $groupKey => $setting): ?>
-            <?php $groupRows = $result[$groupKey]; ?>
-
-            <section class="mb-4">
-              <div class="d-flex justify-content-between align-items-end mb-3 flex-wrap gap-2">
-                <div>
-                  <h5 class="fw-bold mb-1 text-<?= e($setting['class']) ?>">
-                    <i class="bi <?= e($setting['icon']) ?> me-1"></i>
-                    <?= e($setting['title']) ?>
-                  </h5>
-
-                  <p class="text-muted small mb-0">
-                    <?= e($setting['description']) ?>
-                  </p>
-                </div>
-
-                <span class="badge text-bg-<?= e($setting['class']) ?>">
-                  <?= count($groupRows) ?> kết quả
-                </span>
-              </div>
-
-              <?php if (empty($groupRows)): ?>
-                <div class="card p-3 text-muted small">
-                  Chưa có kết quả trong nhóm này.
-                </div>
-              <?php else: ?>
-                <div class="row g-3">
-                  <?php foreach (array_slice($groupRows, 0, 12) as $row): ?>
-                    <div class="col-md-6">
-                      <div class="card h-100 p-3">
-
-                        <div class="d-flex justify-content-between gap-3 mb-2">
-                          <div>
-                            <a
-                              href="<?= url('university.php?id=' . $row['university_id']) ?>"
-                              class="fw-bold text-decoration-none d-block"
-                            >
-                              <?= e($row['university_name']) ?>
-                            </a>
-
-                            <a
-                              href="<?= url('major.php?id=' . $row['major_id']) ?>"
-                              class="text-decoration-none small"
-                            >
-                              <?= e($row['major_name']) ?>
-                            </a>
-                          </div>
-
-                          <span class="score-badge sb-hi align-self-start">
-                            <?= number_format((float)$row['cutoff'], 2) ?>
-                          </span>
+                    <?php if ($error !== ''): ?>
+                        <div class="alert alert-danger small py-2">
+                            <i class="bi bi-exclamation-triangle me-1"></i>
+                            <?= e($error) ?>
                         </div>
+                    <?php endif; ?>
 
-                        <div class="d-flex flex-wrap gap-2 text-muted small mb-3">
-                          <span>
-                            <i class="bi bi-calendar me-1"></i>
-                            <?= e($row['year']) ?>
-                          </span>
+                    <form method="POST" id="recommendForm">
+                        <div class="row g-3 align-items-start">
 
-                          <?php if (!empty($row['combination'])): ?>
-                            <span>
-                              <i class="bi bi-grid me-1"></i>
-                              <?= e($row['combination']) ?>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold small">
+                                    Phương thức xét tuyển <span class="text-danger">*</span>
+                                </label>
+
+                                <select
+                                    name="method"
+                                    id="methodSelect"
+                                    class="form-select"
+                                    required
+                                >
+                                    <option value="">-- Chọn phương thức --</option>
+
+                                    <?php foreach ($methods as $methodValue): ?>
+                                        <option
+                                            value="<?= e($methodValue) ?>"
+                                            <?= $method === $methodValue ? 'selected' : '' ?>
+                                        >
+                                            <?= e(recommend_method_label($methodValue)) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold small">
+                                    Điểm của bạn <span class="text-danger">*</span>
+                                </label>
+
+                                <input
+                                    type="number"
+                                    name="score"
+                                    id="scoreInput"
+                                    class="form-control"
+                                    placeholder="Ví dụ: 24.5"
+                                    step="0.01"
+                                    min="0"
+                                    max="1200"
+                                    value="<?= $score > 0 ? e($score) : '' ?>"
+                                    required
+                                >
+
+                                <small id="scoreHelp" class="text-muted">
+                                    Chọn phương thức để xác định thang điểm
+                                </small>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold small">
+                                    Tổ hợp xét tuyển
+                                    <span id="combinationRequired" class="text-danger">*</span>
+                                </label>
+
+                                <select
+                                    name="combination"
+                                    id="combinationSelect"
+                                    class="form-select"
+                                >
+                                    <option value="">-- Chọn tổ hợp --</option>
+
+                                    <?php foreach ($combinations as $combinationValue): ?>
+                                        <option
+                                            value="<?= e($combinationValue) ?>"
+                                            <?= $combination === $combinationValue ? 'selected' : '' ?>
+                                        >
+                                            <?= e($combinationValue) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+
+                                <small id="combinationHelp" class="text-muted d-none">
+                                    Đánh giá năng lực không cần chọn tổ hợp
+                                </small>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small">
+                                    Ngành muốn học
+                                    <span class="text-muted fw-normal">(không bắt buộc)</span>
+                                </label>
+
+                                <select name="major_id" class="form-select">
+                                    <option value="0">Tất cả ngành</option>
+
+                                    <?php foreach ($majors as $major): ?>
+                                        <option
+                                            value="<?= (int)$major['major_id'] ?>"
+                                            <?= $majorId === (int)$major['major_id'] ? 'selected' : '' ?>
+                                        >
+                                            <?= e($major['major_name']) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small">
+                                    Tỉnh/Thành phố
+                                    <span class="text-muted fw-normal">(không bắt buộc)</span>
+                                </label>
+
+                                <select name="province" class="form-select">
+                                    <option value="">Tất cả tỉnh thành</option>
+
+                                    <?php foreach ($provinces as $provinceValue): ?>
+                                        <option
+                                            value="<?= e($provinceValue) ?>"
+                                            <?= $province === $provinceValue ? 'selected' : '' ?>
+                                        >
+                                            <?= e($provinceValue) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary w-100 fw-semibold py-2">
+                                    <i class="bi bi-stars me-1"></i>
+                                    Xem gợi ý
+                                </button>
+                            </div>
+
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+            <?php if ($result !== null): ?>
+                <?php
+                $total = count($result['safe']) + count($result['fit']) + count($result['try']);
+
+                if ($method === 'DGNL') {
+                    $groupInfo = [
+                        'safe' => ['An toàn', 'Điểm của bạn cao hơn điểm chuẩn từ 50 điểm trở lên', 'success'],
+                        'fit'  => ['Phù hợp', 'Điểm của bạn nằm trong khoảng ±50 điểm', 'primary'],
+                        'try'  => ['Thử sức', 'Điểm của bạn thấp hơn điểm chuẩn tối đa 120 điểm', 'warning']
+                    ];
+                } else {
+                    $groupInfo = [
+                        'safe' => ['An toàn', 'Điểm của bạn cao hơn điểm chuẩn từ 1.5 điểm trở lên', 'success'],
+                        'fit'  => ['Phù hợp', 'Điểm của bạn nằm trong khoảng ±1 điểm', 'primary'],
+                        'try'  => ['Thử sức', 'Điểm của bạn thấp hơn điểm chuẩn tối đa 2 điểm', 'warning']
+                    ];
+                }
+                ?>
+
+                <div class="card shadow-sm">
+                    <div class="card-header">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                            <div class="fw-semibold">
+                                <i class="bi bi-list-stars text-primary me-1"></i>
+                                Kết quả gợi ý cho điểm
+                                <span class="text-primary">
+                                    <?= number_format($score, 2) ?>
+                                </span>
+
+                                <?php if ($method): ?>
+                                    · <?= e(recommend_method_label($method)) ?>
+                                <?php endif; ?>
+
+                                <?php if ($combination): ?>
+                                    · <?= e($combination) ?>
+                                <?php endif; ?>
+
+                                <?php if ($majorName): ?>
+                                    · <?= e($majorName) ?>
+                                <?php endif; ?>
+
+                                <?php if ($province): ?>
+                                    · <?= e($province) ?>
+                                <?php endif; ?>
+                            </div>
+
+                            <span class="badge text-bg-primary">
+                                <?= $total ?> kết quả
                             </span>
-                          <?php endif; ?>
-
-                          <span>
-                            <i class="bi bi-geo-alt me-1"></i>
-                            <?= e($row['province']) ?>
-                          </span>
                         </div>
-
-                        <div class="d-flex justify-content-between align-items-center gap-2 mt-auto">
-                          <span class="small">
-                            Chênh lệch:
-                            <strong class="<?= $row['difference'] >= 0 ? 'text-success' : 'text-warning' ?>">
-                              <?= $row['difference'] > 0 ? '+' : '' ?>
-                              <?= number_format((float)$row['difference'], 2) ?>
-                            </strong>
-                          </span>
-
-                          <div class="d-flex gap-1">
-                            <a
-                              href="<?= url('university.php?id=' . $row['university_id']) ?>"
-                              class="btn btn-sm btn-outline-primary"
-                            >
-                              Chi tiết
-                            </a>
-
-                            <a
-                              href="<?= url(
-                                  'compare.php?uni1=' . $row['university_id']
-                                  . '&major=' . $row['major_id']
-                              ) ?>"
-                              class="btn btn-sm btn-outline-secondary"
-                              title="Đưa vào trang so sánh"
-                            >
-                              <i class="bi bi-bar-chart-line"></i>
-                            </a>
-                          </div>
-                        </div>
-
-                      </div>
                     </div>
-                  <?php endforeach; ?>
+
+                    <div class="card-body p-4">
+                        <?php if ($total === 0): ?>
+                            <div class="text-center text-muted py-5">
+                                <div style="font-size:48px">📭</div>
+                                <h5 class="mt-3">Chưa tìm thấy gợi ý phù hợp</h5>
+                                <p class="small mb-0">
+                                    Hãy thử đổi phương thức, ngành hoặc tỉnh thành.
+                                </p>
+                            </div>
+                        <?php else: ?>
+
+                            <?php foreach (['safe', 'fit', 'try'] as $groupKey): ?>
+                                <?php
+                                $items = $result[$groupKey];
+                                [$title, $desc, $color] = $groupInfo[$groupKey];
+                                ?>
+
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div>
+                                            <h5 class="fw-bold mb-1 text-<?= e($color) ?>">
+                                                <?= e($title) ?>
+                                            </h5>
+
+                                            <p class="text-muted small mb-0">
+                                                <?= e($desc) ?>
+                                            </p>
+                                        </div>
+
+                                        <span class="badge text-bg-<?= e($color) ?>">
+                                            <?= count($items) ?>
+                                        </span>
+                                    </div>
+
+                                    <?php if (empty($items)): ?>
+                                        <div class="text-muted small border rounded-3 p-3">
+                                            Không có kết quả trong nhóm này.
+                                        </div>
+                                    <?php else: ?>
+                                        <div class="table-responsive">
+                                            <table class="table table-hover align-middle small mb-0">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Trường</th>
+                                                        <th>Ngành</th>
+                                                        <th>Tỉnh/TP</th>
+                                                        <th>Phương thức</th>
+                                                        <th>Tổ hợp</th>
+                                                        <th>Điểm chuẩn</th>
+                                                        <th>Chênh lệch</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody>
+                                                    <?php foreach (array_slice($items, 0, 20) as $row): ?>
+                                                        <tr>
+                                                            <td class="fw-semibold">
+                                                                <?= e($row['university_name']) ?>
+                                                            </td>
+
+                                                            <td>
+                                                                <?= e($row['major_name']) ?>
+                                                            </td>
+
+                                                            <td class="text-muted">
+                                                                <?= e($row['province']) ?>
+                                                            </td>
+
+                                                            <td>
+                                                                <span class="badge text-bg-<?= e(recommend_method_color($row['method'])) ?> fw-normal">
+                                                                    <?= e(recommend_method_label($row['method'])) ?>
+                                                                </span>
+                                                            </td>
+
+                                                            <td>
+                                                                <span class="chip">
+                                                                    <?= !empty($row['combination']) ? e($row['combination']) : '—' ?>
+                                                                </span>
+                                                            </td>
+
+                                                            <td>
+                                                                <span class="score-badge">
+                                                                    <?= number_format((float)$row['cutoff'], 2) ?>
+                                                                </span>
+                                                            </td>
+
+                                                            <td>
+                                                                <?php $diff = (float)$row['difference']; ?>
+
+                                                                <span class="<?= $diff >= 0 ? 'text-success' : 'text-danger' ?> fw-semibold">
+                                                                    <?= $diff >= 0 ? '+' : '' ?><?= number_format($diff, 2) ?>
+                                                                </span>
+                                                            </td>
+
+                                                            <td>
+                                                                <a
+                                                                    href="<?= url('university.php?id=' . $row['university_id']) ?>"
+                                                                    class="btn btn-sm btn-outline-primary py-0 px-2"
+                                                                >
+                                                                    Chi tiết
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    <?php endforeach; ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <?php if (count($items) > 20): ?>
+                                            <p class="text-muted small mt-2 mb-0">
+                                                Đang hiển thị 20 kết quả đầu tiên trong nhóm này.
+                                            </p>
+                                        <?php endif; ?>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endforeach; ?>
+
+                        <?php endif; ?>
+                    </div>
                 </div>
+            <?php endif; ?>
 
-                <?php if (count($groupRows) > 12): ?>
-                  <p class="text-muted small mt-2 mb-0">
-                    Đang hiển thị 12 trong <?= count($groupRows) ?> kết quả của nhóm.
-                  </p>
-                <?php endif; ?>
-              <?php endif; ?>
-            </section>
-          <?php endforeach; ?>
-
-        <?php endif; ?>
-      <?php endif; ?>
-
+        </div>
     </div>
-  </div>
 </div>
+<style>
+#recommendForm .form-label {
+    min-height: 22px;
+}
 
+#recommendForm .form-control,
+#recommendForm .form-select {
+    height: 46px;
+}
+</style>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-  const methodSelect = document.getElementById('methodSelect');
-  const scoreInput = document.getElementById('scoreInput');
-  const scoreHelp = document.getElementById('scoreHelp');
-  const combinationSelect = document.getElementById('combinationSelect');
-  const combinationRequired = document.getElementById('combinationRequired');
-  const combinationHelp = document.getElementById('combinationHelp');
+function updateRecommendForm() {
+    const methodSelect = document.getElementById('methodSelect');
+    const scoreInput = document.getElementById('scoreInput');
+    const scoreHelp = document.getElementById('scoreHelp');
+    const combinationSelect = document.getElementById('combinationSelect');
+    const combinationRequired = document.getElementById('combinationRequired');
+    const combinationHelp = document.getElementById('combinationHelp');
 
-  function updateScoreForm() {
+    if (!methodSelect || !scoreInput || !combinationSelect) {
+        return;
+    }
+
     const method = methodSelect.value;
-    const combinationOptional = method === 'DGNL' || method === 'Thang';
 
     if (method === 'DGNL') {
-      scoreInput.max = '1200';
-      scoreInput.placeholder = 'Ví dụ: 850';
-      scoreHelp.textContent = 'Thang điểm đánh giá năng lực, tối đa 1200';
+        scoreInput.max = '1200';
+        scoreInput.placeholder = 'Ví dụ: 850';
+        scoreHelp.textContent = 'Đánh giá năng lực dùng thang điểm đến 1200';
+
+        combinationSelect.value = '';
+        combinationSelect.disabled = true;
+        combinationSelect.required = false;
+
+        combinationRequired.classList.add('d-none');
+        combinationHelp.classList.remove('d-none');
     } else {
-      scoreInput.max = '30';
-      scoreInput.placeholder = 'Ví dụ: 24.5';
-      scoreHelp.textContent = 'Thang điểm tối đa 30';
+        scoreInput.max = '30';
+        scoreInput.placeholder = 'Ví dụ: 24.5';
+        scoreHelp.textContent = 'Phương thức này dùng thang điểm 30';
+
+        combinationSelect.disabled = false;
+        combinationSelect.required = true;
+
+        combinationRequired.classList.remove('d-none');
+        combinationHelp.classList.add('d-none');
     }
+}
 
-    combinationRequired.classList.toggle('d-none', combinationOptional);
-    combinationHelp.classList.toggle('d-none', !combinationOptional);
-    combinationSelect.required = !combinationOptional;
-
-    if (combinationOptional) {
-      combinationSelect.value = '';
-    }
-  }
-
-  methodSelect.addEventListener('change', updateScoreForm);
-  updateScoreForm();
-});
+document.getElementById('methodSelect')?.addEventListener('change', updateRecommendForm);
+updateRecommendForm();
 </script>
 
 <?php require_once 'includes/footer.php'; ?>

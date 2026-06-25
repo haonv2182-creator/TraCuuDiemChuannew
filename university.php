@@ -334,7 +334,7 @@ $stats = $statsStmt->fetch();
             <tbody>
               <?php if (empty($scores)): ?>
                 <tr>
-                  <td colspan="6" class="text-center text-muted py-5">
+                  <td colspan="5" class="text-center text-muted py-5">
                     Không có dữ liệu phù hợp với bộ lọc hiện tại.
                   </td>
                 </tr>

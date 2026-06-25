@@ -73,11 +73,7 @@ $years=range((int)date('Y'),2015); $combos=['A00','A01','A02','B00','B01','C00',
               <select name="combination" class="form-select">
                 <?php foreach($combos as $c): ?><option value="<?=$c?>" <?=($editRow['combination']??'')===$c?'selected':''?>><?=$c?></option><?php endforeach; ?>
               </select></div>
-            <div class="col-md-3"><label class="form-label fw-semibold small">Điểm chuẩn <span class="text-danger">*</span></label>
-              <input type="number" name="score" class="form-control" step=".01" min="0" max="30" required value="<?=e($editRow['score']??'')?>"></div>
-            <div class="col-md-3"><label class="form-label fw-semibold small">Chỉ tiêu</label>
-              <input type="number" name="quota" class="form-control" min="0" value="<?=e($editRow['quota']??0)?>"></div>
-          </div>
+
           <div class="d-flex gap-2 mt-3">
             <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-save me-1"></i>Lưu</button>
             <a href="<?=url('admin/manage_scores.php')?>" class="btn btn-outline-secondary btn-sm">Hủy</a>
@@ -104,11 +100,10 @@ $years=range((int)date('Y'),2015); $combos=['A00','A01','A02','B00','B01','C00',
       <div class="card-header"><i class="bi bi-table me-1"></i>Tổng: <strong class="text-primary"><?=number_format($pg['total'])?></strong> bản ghi</div>
       <div class="table-responsive">
         <table class="table table-hover mb-0 align-middle small"><thead>
-          <tr><th>#</th><th>Trường</th><th>Ngành</th><th>Năm</th><th>Tổ hợp</th><th>Điểm</th><th>Chỉ tiêu</th><th>Thao tác</th></tr>
+          <tr><th>#</th><th>Trường</th><th>Ngành</th><th>Năm</th><th>Tổ hợp</th><th>Điểm</th><th>Thao tác</th></tr>
         </thead><tbody>
           <?php foreach($list as $i=>$r): $c=$r['score']>=27?'sb-hi':($r['score']>=23?'sb-mid':'sb-lo'); ?>
           <tr>
-            <td class="text-muted"><?=$pg['offset']+$i+1?></td>
             <td><?=e($r['university_name'])?></td><td><?=e($r['major_name'])?></td>
             <td><span class="chip"><?=$r['year']?></span></td>
             <td><span class="chip"><?=e($r['combination'])?></span></td>

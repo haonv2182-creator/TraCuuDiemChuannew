@@ -1,4 +1,3 @@
-
 <?php
 $pageTitle = 'DiemChuan.vn – Tra cứu điểm chuẩn đại học Việt Nam';
 require_once 'includes/header.php';
@@ -8,30 +7,34 @@ $q       = trim($_GET['q'] ?? '');
 $mid     = (int)($_GET['major'] ?? 0);
 $method  = trim($_GET['method'] ?? '');
 $tab     = isset($_GET['major']) ? 'major' : 'uni';
-$showAll = isset($_GET['show_all']) && $_GET['show_all'] === '1';
+$showAll = ($_GET['show_all'] ?? '') === '1';
+$isHome  = $q === '' && $mid === 0;
 
-$methodLabels = [
-    'THPT'    => 'Thi THPT',
-    'HocBa'   => 'Học bạ',
-    'TongHop' => 'Tổng hợp',
-    'DGNL'    => 'Đánh giá NL'
+$methods = [
+    'THPT' => [
+        'label' => 'Thi THPT',
+        'color' => 'primary'
+    ],
+    'HocBa' => [
+        'label' => 'Học bạ',
+        'color' => 'success'
+    ],
+    'TongHop' => [
+        'label' => 'Tổng hợp',
+        'color' => 'warning'
+    ],
+    'DGNL' => [
+        'label' => 'Đánh giá NL',
+        'color' => 'info'
+    ]
 ];
 
-$methodColors = [
-    'THPT'    => 'primary',
-    'HocBa'   => 'success',
-    'TongHop' => 'warning',
-    'DGNL'    => 'info'
-];
-
-// ── Tất cả ngành cho dropdown ────────────────────────────────
 $allMajors = $db->query("
     SELECT major_id, major_name
     FROM majors
     ORDER BY major_name
 ")->fetchAll();
 
-// ── Các ngành có nhiều dữ liệu nhất để tìm nhanh ─────────────
 $popularMajors = $db->query("
     SELECT
         m.major_id,
@@ -45,7 +48,6 @@ $popularMajors = $db->query("
     LIMIT 5
 ")->fetchAll();
 
-// ── Kết quả tìm trường ───────────────────────────────────────
 $uniResults = [];
 
 if ($q !== '') {
@@ -61,94 +63,90 @@ if ($q !== '') {
         LEFT JOIN admission_scores s
             ON u.university_id = s.university_id
         WHERE u.university_name LIKE :q
-        GROUP BY u.university_id
+        GROUP BY
+            u.university_id,
+            u.university_name,
+            u.university_code,
+            u.province,
+            u.school_type
         ORDER BY u.university_name ASC
     ");
 
-    $stmt->execute([
-        ':q' => "%$q%"
-    ]);
-
+    $stmt->execute([':q' => "%$q%"]);
     $uniResults = $stmt->fetchAll();
 }
 
-// ── Kết quả tìm theo ngành ───────────────────────────────────
 $majorResults = [];
 $majorName    = '';
 
-if ($mid) {
-    $mn = $db->prepare("
+if ($mid > 0) {
+    $stmt = $db->prepare("
         SELECT major_name
         FROM majors
         WHERE major_id = ?
     ");
-
-    $mn->execute([$mid]);
-    $majorName = $mn->fetchColumn();
+    $stmt->execute([$mid]);
+    $majorName = (string)$stmt->fetchColumn();
 
     $yearSql = "
         SELECT MAX(year)
         FROM admission_scores
         WHERE major_id = :mid
     ";
-
-    $yearParams = [
-        ':mid' => $mid
-    ];
+    $yearParams = [':mid' => $mid];
 
     if ($method !== '') {
-        $yearSql .= " AND method = :method";
+        $yearSql .= ' AND method = :method';
         $yearParams[':method'] = $method;
     }
 
-    $yearStmt = $db->prepare($yearSql);
-    $yearStmt->execute($yearParams);
+    $stmt = $db->prepare($yearSql);
+    $stmt->execute($yearParams);
+    $latestYear = (int)$stmt->fetchColumn();
 
-    $latestYear = (int)$yearStmt->fetchColumn();
+    if ($latestYear > 0) {
+        $majorWhere = "
+            s.major_id = :mid
+            AND s.year = :year
+        ";
+        $majorParams = [
+            ':mid'  => $mid,
+            ':year' => $latestYear
+        ];
 
-    $majorWhere = "
-        s.major_id = :mid
-        AND s.year = :yr
-    ";
+        if ($method !== '') {
+            $majorWhere .= ' AND s.method = :method';
+            $majorParams[':method'] = $method;
+        }
 
-    $majorParams = [
-        ':mid' => $mid,
-        ':yr'  => $latestYear
-    ];
+        $stmt = $db->prepare("
+            SELECT
+                u.university_id,
+                u.university_name,
+                u.university_code,
+                u.province,
+                u.school_type,
+                s.score,
+                s.combination,
+                s.method,
+                s.year
+            FROM admission_scores s
+            JOIN universities u
+                ON s.university_id = u.university_id
+            WHERE $majorWhere
+            ORDER BY s.score DESC
+        ");
 
-    if ($method !== '') {
-        $majorWhere .= " AND s.method = :method";
-        $majorParams[':method'] = $method;
+        $stmt->execute($majorParams);
+        $majorResults = $stmt->fetchAll();
     }
-
-    $stmt = $db->prepare("
-        SELECT
-            u.university_id,
-            u.university_name,
-            u.university_code,
-            u.province,
-            u.school_type,
-            s.score,
-            s.combination,
-            s.method,
-            s.year
-        FROM admission_scores s
-        JOIN universities u
-            ON s.university_id = u.university_id
-        WHERE $majorWhere
-        ORDER BY s.score DESC
-    ");
-
-    $stmt->execute($majorParams);
-    $majorResults = $stmt->fetchAll();
 }
 
-// ── Trường đại học: mặc định nổi bật, bấm xem tất cả mới hiện toàn bộ ──
-$featuredUnis = [];
+$featuredUnis   = [];
+$featuredMajors = [];
 
-if (!$q && !$mid) {
-    $whereFeatured = $showAll ? "" : "WHERE u.is_featured = 1";
-    $orderFeatured = $showAll ? "u.university_name ASC" : "u.university_name ASC";
+if ($isHome) {
+    $featuredFilter = $showAll ? '' : 'WHERE u.is_featured = 1';
 
     $featuredUnis = $db->query("
         SELECT
@@ -161,16 +159,16 @@ if (!$q && !$mid) {
         FROM universities u
         LEFT JOIN admission_scores s
             ON u.university_id = s.university_id
-        $whereFeatured
-        GROUP BY u.university_id
-        ORDER BY $orderFeatured
+        $featuredFilter
+        GROUP BY
+            u.university_id,
+            u.university_name,
+            u.university_code,
+            u.province,
+            u.school_type
+        ORDER BY u.university_name ASC
     ")->fetchAll();
-}
 
-// ── Ngành nổi bật ────────────────────────────────────────────
-$featuredMajors = [];
-
-if (!$q && !$mid) {
     $featuredMajors = $db->query("
         SELECT
             m.major_id,
@@ -185,7 +183,6 @@ if (!$q && !$mid) {
     ")->fetchAll();
 }
 
-// ── Thống kê ─────────────────────────────────────────────────
 $stats = $db->query("
     SELECT
         (SELECT COUNT(*) FROM universities) AS unis,
@@ -193,20 +190,107 @@ $stats = $db->query("
         (SELECT COUNT(*) FROM admission_scores) AS scores
 ")->fetch();
 
+$statItems = [
+    [
+        'value' => (int)$stats['unis'],
+        'label' => 'Trường đại học',
+        'icon'  => 'bi-building'
+    ],
+    [
+        'value' => (int)$stats['majors'],
+        'label' => 'Ngành học',
+        'icon'  => 'bi-book'
+    ],
+    [
+        'value' => (int)$stats['scores'],
+        'label' => 'Dữ liệu điểm chuẩn',
+        'icon'  => 'bi-graph-up-arrow'
+    ]
+];
+
+$actionItems = [
+    [
+        'url'         => 'search.php',
+        'icon_class'  => 'action-search',
+        'icon'        => 'bi-search',
+        'title'       => 'Tra cứu điểm chuẩn',
+        'description' => 'Tìm điểm theo trường, ngành, tổ hợp, năm và phương thức xét tuyển.',
+        'link_text'   => 'Tra cứu ngay'
+    ],
+    [
+        'url'         => 'compare.php',
+        'icon_class'  => 'action-compare',
+        'icon'        => 'bi-bar-chart-line',
+        'title'       => 'So sánh trường',
+        'description' => 'So sánh điểm chuẩn giữa hai trường qua từng năm và từng ngành.',
+        'link_text'   => 'So sánh ngay'
+    ],
+    [
+        'url'         => 'ai_recommend.php',
+        'icon_class'  => 'action-ai',
+        'icon'        => 'bi-stars',
+        'title'       => 'Gợi ý trường phù hợp',
+        'description' => 'Nhập điểm của bạn để nhận gợi ý ngành và trường phù hợp.',
+        'link_text'   => 'Nhận gợi ý'
+    ]
+];
+
 function uni_code_box($code, $name, $length = 4)
 {
     $code = trim((string)$code);
 
-    if ($code !== '') {
-        return $code;
-    }
+    return $code !== ''
+        ? $code
+        : mb_substr(trim((string)$name), 0, $length, 'UTF-8');
+}
 
-    return mb_substr(
-        trim((string)$name),
-        0,
-        $length,
-        'UTF-8'
-    );
+function render_uni_card(array $university)
+{
+    ?>
+    <div class="col-6 col-md-4 col-lg-3">
+        <a
+            href="<?= url('university.php?id=' . $university['university_id']) ?>"
+            class="uni-card h-100 text-decoration-none"
+        >
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <div
+                    class="uni-logo flex-shrink-0 d-flex align-items-center justify-content-center"
+                    style="width:48px;height:48px;font-size:12px;font-weight:700"
+                >
+                    <?= e(uni_code_box(
+                        $university['university_code'] ?? '',
+                        $university['university_name'] ?? '',
+                        4
+                    )) ?>
+                </div>
+
+                <div class="overflow-hidden">
+                    <div
+                        class="fw-bold text-dark"
+                        style="font-size:13px;line-height:1.3"
+                    >
+                        <?= e($university['university_name']) ?>
+                    </div>
+
+                    <div class="text-muted" style="font-size:11px">
+                        <i class="bi bi-geo-alt me-1"></i>
+                        <?= e($university['province']) ?>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 flex-wrap">
+                <span class="chip">
+                    <?= (int)$university['mcnt'] ?> ngành
+                </span>
+
+                <span class="chip">
+                    <?= e($university['school_type']) ?>
+                </span>
+            </div>
+        </a>
+    </div>
+    <?php
 }
 ?>
 
@@ -300,12 +384,12 @@ function uni_code_box($code, $name, $length = 4)
                     >
                         <option value="0">-- Chọn ngành học --</option>
 
-                        <?php foreach ($allMajors as $m): ?>
+                        <?php foreach ($allMajors as $major): ?>
                             <option
-                                value="<?= $m['major_id'] ?>"
-                                <?= $mid == $m['major_id'] ? 'selected' : '' ?>
+                                value="<?= (int)$major['major_id'] ?>"
+                                <?= $mid === (int)$major['major_id'] ? 'selected' : '' ?>
                             >
-                                <?= e($m['major_name']) ?>
+                                <?= e($major['major_name']) ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -318,21 +402,14 @@ function uni_code_box($code, $name, $length = 4)
                     >
                         <option value="">Tất cả phương thức</option>
 
-                        <option value="THPT" <?= $method === 'THPT' ? 'selected' : '' ?>>
-                            Thi THPT
-                        </option>
-
-                        <option value="HocBa" <?= $method === 'HocBa' ? 'selected' : '' ?>>
-                            Học bạ
-                        </option>
-
-                        <option value="TongHop" <?= $method === 'TongHop' ? 'selected' : '' ?>>
-                            Tổng hợp
-                        </option>
-
-                        <option value="DGNL" <?= $method === 'DGNL' ? 'selected' : '' ?>>
-                            Đánh giá NL
-                        </option>
+                        <?php foreach ($methods as $value => $item): ?>
+                            <option
+                                value="<?= e($value) ?>"
+                                <?= $method === $value ? 'selected' : '' ?>
+                            >
+                                <?= e($item['label']) ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
 
                     <button
@@ -349,57 +426,33 @@ function uni_code_box($code, $name, $length = 4)
                 <div class="popular-searches">
                     <span class="popular-searches-label">Tìm nhanh:</span>
 
-                    <?php foreach ($popularMajors as $m): ?>
+                    <?php foreach ($popularMajors as $major): ?>
                         <button
                             type="button"
                             class="popular-search-btn"
-                            data-major-id="<?= $m['major_id'] ?>"
+                            data-major-id="<?= (int)$major['major_id'] ?>"
                         >
-                            <?= e($m['major_name']) ?>
+                            <?= e($major['major_name']) ?>
                         </button>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
 
             <div class="home-hero-stats">
-                <div class="home-hero-stat">
-                    <div class="home-stat-icon">
-                        <i class="bi bi-building"></i>
-                    </div>
+                <?php foreach ($statItems as $item): ?>
+                    <div class="home-hero-stat">
+                        <div class="home-stat-icon">
+                            <i class="bi <?= e($item['icon']) ?>"></i>
+                        </div>
 
-                    <div>
-                        <strong data-counter="<?= (int)$stats['unis'] ?>">
-                            <?= number_format($stats['unis']) ?>
-                        </strong>
-                        <span>Trường đại học</span>
+                        <div>
+                            <strong data-counter="<?= $item['value'] ?>">
+                                <?= number_format($item['value']) ?>
+                            </strong>
+                            <span><?= e($item['label']) ?></span>
+                        </div>
                     </div>
-                </div>
-
-                <div class="home-hero-stat">
-                    <div class="home-stat-icon">
-                        <i class="bi bi-book"></i>
-                    </div>
-
-                    <div>
-                        <strong data-counter="<?= (int)$stats['majors'] ?>">
-                            <?= number_format($stats['majors']) ?>
-                        </strong>
-                        <span>Ngành học</span>
-                    </div>
-                </div>
-
-                <div class="home-hero-stat">
-                    <div class="home-stat-icon">
-                        <i class="bi bi-graph-up-arrow"></i>
-                    </div>
-
-                    <div>
-                        <strong data-counter="<?= (int)$stats['scores'] ?>">
-                            <?= number_format($stats['scores']) ?>
-                        </strong>
-                        <span>Dữ liệu điểm chuẩn</span>
-                    </div>
-                </div>
+                <?php endforeach; ?>
             </div>
 
         </div>
@@ -408,7 +461,7 @@ function uni_code_box($code, $name, $length = 4)
 
 <div class="container py-5">
 
-    <?php if ($mid && $majorName): ?>
+    <?php if ($mid > 0 && $majorName !== ''): ?>
 
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
@@ -425,10 +478,10 @@ function uni_code_box($code, $name, $length = 4)
                         · Dữ liệu năm <?= e($majorResults[0]['year']) ?> mới nhất
                     <?php endif; ?>
 
-                    <?php if ($method): ?>
+                    <?php if ($method !== ''): ?>
                         · Phương thức:
                         <span class="text-primary">
-                            <?= e($methodLabels[$method] ?? $method) ?>
+                            <?= e($methods[$method]['label'] ?? $method) ?>
                         </span>
                     <?php endif; ?>
                 </p>
@@ -474,19 +527,20 @@ function uni_code_box($code, $name, $length = 4)
                         </thead>
 
                         <tbody>
-                            <?php foreach ($majorResults as $i => $r): ?>
+                            <?php foreach ($majorResults as $index => $row): ?>
                                 <?php
-                                $cls = $r['score'] >= 27
+                                $scoreClass = $row['score'] >= 27
                                     ? 'sb-hi'
-                                    : ($r['score'] >= 23 ? 'sb-mid' : 'sb-lo');
+                                    : ($row['score'] >= 23 ? 'sb-mid' : 'sb-lo');
 
-                                $methodColor = $methodColors[$r['method']] ?? 'secondary';
-                                $methodLabel = $methodLabels[$r['method']] ?? $r['method'];
+                                $methodItem  = $methods[$row['method']] ?? null;
+                                $methodColor = $methodItem['color'] ?? 'secondary';
+                                $methodLabel = $methodItem['label'] ?? $row['method'];
                                 ?>
 
                                 <tr>
                                     <td class="text-muted small">
-                                        <?= $i + 1 ?>
+                                        <?= $index + 1 ?>
                                     </td>
 
                                     <td>
@@ -495,42 +549,38 @@ function uni_code_box($code, $name, $length = 4)
                                                 class="uni-logo flex-shrink-0 d-flex align-items-center justify-content-center"
                                                 style="width:36px;height:36px;font-size:10px;font-weight:700"
                                             >
-                                                <?= e(
-                                                    uni_code_box(
-                                                        $r['university_code'] ?? '',
-                                                        $r['university_name'] ?? '',
-                                                        3
-                                                    )
-                                                ) ?>
+                                                <?= e(uni_code_box(
+                                                    $row['university_code'] ?? '',
+                                                    $row['university_name'] ?? '',
+                                                    3
+                                                )) ?>
                                             </div>
 
-                                            <div>
-                                                <div class="fw-semibold small">
-                                                    <?= e($r['university_name']) ?>
-                                                </div>
+                                            <div class="fw-semibold small">
+                                                <?= e($row['university_name']) ?>
                                             </div>
                                         </div>
                                     </td>
 
                                     <td class="text-muted small">
-                                        <?= e($r['province']) ?>
+                                        <?= e($row['province']) ?>
                                     </td>
 
                                     <td>
                                         <span class="chip">
-                                            <?= e($r['school_type']) ?>
+                                            <?= e($row['school_type']) ?>
                                         </span>
                                     </td>
 
                                     <td>
                                         <span class="chip">
-                                            <?= !empty($r['combination']) ? e($r['combination']) : '—' ?>
+                                            <?= !empty($row['combination']) ? e($row['combination']) : '—' ?>
                                         </span>
                                     </td>
 
                                     <td>
                                         <span
-                                            class="badge text-bg-<?= $methodColor ?> fw-normal"
+                                            class="badge text-bg-<?= e($methodColor) ?> fw-normal"
                                             style="font-size:10px;border-radius:20px"
                                         >
                                             <?= e($methodLabel) ?>
@@ -538,14 +588,14 @@ function uni_code_box($code, $name, $length = 4)
                                     </td>
 
                                     <td>
-                                        <span class="score-badge <?= $cls ?> fw-bold">
-                                            <?= number_format((float)$r['score'], 2) ?>
+                                        <span class="score-badge <?= e($scoreClass) ?> fw-bold">
+                                            <?= number_format((float)$row['score'], 2) ?>
                                         </span>
                                     </td>
 
                                     <td>
                                         <a
-                                            href="<?= url('university.php?id=' . $r['university_id']) ?>"
+                                            href="<?= url('university.php?id=' . $row['university_id']) ?>"
                                             class="btn btn-sm btn-outline-primary py-0 px-2"
                                         >
                                             Chi tiết
@@ -601,52 +651,8 @@ function uni_code_box($code, $name, $length = 4)
         <?php else: ?>
 
             <div class="row g-3">
-                <?php foreach ($uniResults as $u): ?>
-                    <div class="col-6 col-md-4 col-lg-3">
-                        <a
-                            href="<?= url('university.php?id=' . $u['university_id']) ?>"
-                            class="uni-card h-100 text-decoration-none"
-                        >
-                            <div class="d-flex align-items-center gap-3 mb-3">
-                                <div
-                                    class="uni-logo flex-shrink-0 d-flex align-items-center justify-content-center"
-                                    style="width:48px;height:48px;font-size:12px;font-weight:700"
-                                >
-                                    <?= e(
-                                        uni_code_box(
-                                            $u['university_code'] ?? '',
-                                            $u['university_name'] ?? '',
-                                            4
-                                        )
-                                    ) ?>
-                                </div>
-
-                                <div class="overflow-hidden">
-                                    <div
-                                        class="fw-bold text-dark"
-                                        style="font-size:13px;line-height:1.3"
-                                    >
-                                        <?= e($u['university_name']) ?>
-                                    </div>
-
-                                    <div class="text-muted" style="font-size:11px">
-                                        <i class="bi bi-geo-alt me-1"></i>
-                                        <?= e($u['province']) ?>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="d-flex gap-2 flex-wrap">
-                                <span class="chip">
-                                    <?= $u['mcnt'] ?> ngành
-                                </span>
-
-                                <span class="chip">
-                                    <?= e($u['school_type']) ?>
-                                </span>
-                            </div>
-                        </a>
-                    </div>
+                <?php foreach ($uniResults as $university): ?>
+                    <?php render_uni_card($university); ?>
                 <?php endforeach; ?>
             </div>
 
@@ -692,52 +698,8 @@ function uni_code_box($code, $name, $length = 4)
             </div>
 
             <div class="row g-3">
-                <?php foreach ($featuredUnis as $u): ?>
-                    <div class="col-6 col-md-4 col-lg-3">
-                        <a
-                            href="<?= url('university.php?id=' . $u['university_id']) ?>"
-                            class="uni-card h-100 text-decoration-none"
-                        >
-                            <div class="d-flex align-items-center gap-3 mb-3">
-                                <div
-                                    class="uni-logo flex-shrink-0 d-flex align-items-center justify-content-center"
-                                    style="width:48px;height:48px;font-size:12px;font-weight:700"
-                                >
-                                    <?= e(
-                                        uni_code_box(
-                                            $u['university_code'] ?? '',
-                                            $u['university_name'] ?? '',
-                                            4
-                                        )
-                                    ) ?>
-                                </div>
-
-                                <div class="overflow-hidden">
-                                    <div
-                                        class="fw-bold text-dark"
-                                        style="font-size:13px;line-height:1.3"
-                                    >
-                                        <?= e($u['university_name']) ?>
-                                    </div>
-
-                                    <div class="text-muted" style="font-size:11px">
-                                        <i class="bi bi-geo-alt me-1"></i>
-                                        <?= e($u['province']) ?>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="d-flex gap-2 flex-wrap">
-                                <span class="chip">
-                                    <?= $u['mcnt'] ?> ngành
-                                </span>
-
-                                <span class="chip">
-                                    <?= e($u['school_type']) ?>
-                                </span>
-                            </div>
-                        </a>
-                    </div>
+                <?php foreach ($featuredUnis as $university): ?>
+                    <?php render_uni_card($university); ?>
                 <?php endforeach; ?>
             </div>
         </div>
@@ -769,10 +731,10 @@ function uni_code_box($code, $name, $length = 4)
             </div>
 
             <div class="row g-3">
-                <?php foreach ($featuredMajors as $m): ?>
+                <?php foreach ($featuredMajors as $major): ?>
                     <div class="col-6 col-md-4 col-lg-3">
                         <a
-                            href="<?= url('index.php?major=' . $m['major_id']) ?>"
+                            href="<?= url('index.php?major=' . $major['major_id']) ?>"
                             class="uni-card h-100 text-decoration-none"
                         >
                             <div class="d-flex align-items-center gap-3 mb-3">
@@ -788,12 +750,12 @@ function uni_code_box($code, $name, $length = 4)
                                         class="fw-bold text-dark"
                                         style="font-size:13px;line-height:1.3"
                                     >
-                                        <?= e($m['major_name']) ?>
+                                        <?= e($major['major_name']) ?>
                                     </div>
 
                                     <div class="text-muted" style="font-size:11px">
                                         <i class="bi bi-building me-1"></i>
-                                        <?= (int)$m['university_count'] ?>
+                                        <?= (int)$major['university_count'] ?>
                                         trường đào tạo
                                     </div>
                                 </div>
@@ -801,7 +763,7 @@ function uni_code_box($code, $name, $length = 4)
 
                             <div class="d-flex gap-2 flex-wrap">
                                 <span class="chip">
-                                    <?= (int)$m['university_count'] ?> trường
+                                    <?= (int)$major['university_count'] ?> trường
                                 </span>
                             </div>
                         </a>
@@ -826,82 +788,29 @@ function uni_code_box($code, $name, $length = 4)
             </div>
 
             <div class="row g-3">
+                <?php foreach ($actionItems as $item): ?>
+                    <div class="col-md-4 reveal-up">
+                        <a
+                            href="<?= url($item['url']) ?>"
+                            class="home-action-card text-decoration-none"
+                        >
+                            <div class="home-action-icon <?= e($item['icon_class']) ?>">
+                                <i class="bi <?= e($item['icon']) ?>"></i>
+                            </div>
 
-                <div class="col-md-4 reveal-up">
-                    <a
-                        href="<?= url('search.php') ?>"
-                        class="home-action-card text-decoration-none"
-                    >
-                        <div class="home-action-icon action-search">
-                            <i class="bi bi-search"></i>
-                        </div>
+                            <div>
+                                <h5><?= e($item['title']) ?></h5>
 
-                        <div>
-                            <h5>Tra cứu điểm chuẩn</h5>
+                                <p><?= e($item['description']) ?></p>
 
-                            <p>
-                                Tìm điểm theo trường, ngành, tổ hợp, năm và
-                                phương thức xét tuyển.
-                            </p>
-
-                            <span class="home-action-link">
-                                Tra cứu ngay
-                                <i class="bi bi-arrow-right"></i>
-                            </span>
-                        </div>
-                    </a>
-                </div>
-
-                <div class="col-md-4 reveal-up">
-                    <a
-                        href="<?= url('compare.php') ?>"
-                        class="home-action-card text-decoration-none"
-                    >
-                        <div class="home-action-icon action-compare">
-                            <i class="bi bi-bar-chart-line"></i>
-                        </div>
-
-                        <div>
-                            <h5>So sánh trường</h5>
-
-                            <p>
-                                So sánh điểm chuẩn giữa hai trường qua từng năm
-                                và từng ngành.
-                            </p>
-
-                            <span class="home-action-link">
-                                So sánh ngay
-                                <i class="bi bi-arrow-right"></i>
-                            </span>
-                        </div>
-                    </a>
-                </div>
-
-                <div class="col-md-4 reveal-up">
-                    <a
-                        href="<?= url('ai_recommend.php') ?>"
-                        class="home-action-card text-decoration-none"
-                    >
-                        <div class="home-action-icon action-ai">
-                            <i class="bi bi-stars"></i>
-                        </div>
-
-                        <div>
-                            <h5>Gợi ý trường phù hợp</h5>
-
-                            <p>
-                                Nhập điểm của bạn để nhận gợi ý ngành và trường
-                                phù hợp.
-                            </p>
-
-                            <span class="home-action-link">
-                                Nhận gợi ý
-                                <i class="bi bi-arrow-right"></i>
-                            </span>
-                        </div>
-                    </a>
-                </div>
-
+                                <span class="home-action-link">
+                                    <?= e($item['link_text']) ?>
+                                    <i class="bi bi-arrow-right"></i>
+                                </span>
+                            </div>
+                        </a>
+                    </div>
+                <?php endforeach; ?>
             </div>
         </section>
 
@@ -911,6 +820,7 @@ function uni_code_box($code, $name, $length = 4)
 
 <script>
 function switchHomeTab(tab) {
+    const isUniversityTab = tab === 'uni';
     const formUni = document.getElementById('form-uni');
     const formMajor = document.getElementById('form-major');
     const tabUni = document.getElementById('tab-uni');
@@ -918,30 +828,19 @@ function switchHomeTab(tab) {
     const featuredUniversities = document.getElementById('featured-universities');
     const featuredMajors = document.getElementById('featured-majors');
 
-    if (tab === 'uni') {
-        formUni.classList.remove('d-none');
-        formMajor.classList.add('d-none');
+    formUni.classList.toggle('d-none', !isUniversityTab);
+    formMajor.classList.toggle('d-none', isUniversityTab);
 
-        tabUni.classList.replace('btn-outline-light', 'btn-light');
-        tabMajor.classList.replace('btn-light', 'btn-outline-light');
+    tabUni.classList.toggle('btn-light', isUniversityTab);
+    tabUni.classList.toggle('btn-outline-light', !isUniversityTab);
+    tabMajor.classList.toggle('btn-light', !isUniversityTab);
+    tabMajor.classList.toggle('btn-outline-light', isUniversityTab);
 
-        featuredUniversities?.classList.remove('d-none');
-        featuredMajors?.classList.add('d-none');
-    } else {
-        formMajor.classList.remove('d-none');
-        formUni.classList.add('d-none');
-
-        tabMajor.classList.replace('btn-outline-light', 'btn-light');
-        tabUni.classList.replace('btn-light', 'btn-outline-light');
-
-        featuredMajors?.classList.remove('d-none');
-        featuredUniversities?.classList.add('d-none');
-    }
+    featuredUniversities?.classList.toggle('d-none', !isUniversityTab);
+    featuredMajors?.classList.toggle('d-none', isUniversityTab);
 }
 
-window.switchHomeTab = switchHomeTab;
-
-<?php if ($mid): ?>
+<?php if ($mid > 0): ?>
 switchHomeTab('major');
 <?php endif; ?>
 </script>

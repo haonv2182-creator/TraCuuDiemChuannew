@@ -6,35 +6,53 @@ startSession();
 
 $_cur   = basename($_SERVER['PHP_SELF'], '.php');
 $_flash = getFlash();
+
+$styleFile = __DIR__ . '/../assets/css/style.css';
+$styleVersion = file_exists($styleFile)
+    ? filemtime($styleFile)
+    : time();
 ?>
+
 <!DOCTYPE html>
 <html lang="vi" data-theme="light">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title><?= $pageTitle ?? 'DiemChuan.vn – Tra cứu điểm chuẩn đại học' ?></title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
 
+  <title>
+    <?= $pageTitle ?? 'DiemChuan.vn – Tra cứu điểm chuẩn đại học' ?>
+  </title>
+
+  <!-- Bootstrap -->
   <link
     rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
   >
 
+  <!-- Bootstrap Icons -->
   <link
     rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
   >
 
+  <!-- CSS chính -->
   <link
     rel="stylesheet"
-    href="<?= url('assets/css/style.css') ?>"
+    href="<?= url('assets/css/style.css') ?>?v=<?= $styleVersion ?>"
   >
 
+  <!-- Font -->
   <link
-    href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap"
     rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap"
   >
 </head>
+
 <body>
 
 <?php if ($_flash): ?>
@@ -43,7 +61,9 @@ $_flash = getFlash();
     style="z-index:9999;min-width:320px;border-radius:12px"
     role="alert"
   >
-    <i class="bi bi-<?= $_flash['type'] === 'success' ? 'check-circle' : 'exclamation-triangle' ?> me-2"></i>
+    <i
+      class="bi bi-<?= $_flash['type'] === 'success' ? 'check-circle' : 'exclamation-triangle' ?> me-2"
+    ></i>
 
     <?= e($_flash['msg']) ?>
 
@@ -60,13 +80,14 @@ $_flash = getFlash();
 <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top shadow-sm">
   <div class="container">
 
+    <!-- Logo -->
     <a
       class="navbar-brand d-flex align-items-center gap-2 fw-bold text-primary"
       href="<?= url('index.php') ?>"
     >
       <span class="brand-icon">🎓</span>
 
-      DiemChuan
+      <span>DiemChuan</span>
 
       <span
         class="badge bg-primary ms-1"
@@ -76,6 +97,7 @@ $_flash = getFlash();
       </span>
     </a>
 
+    <!-- Nút menu điện thoại -->
     <button
       class="navbar-toggler border-0"
       type="button"
@@ -90,6 +112,7 @@ $_flash = getFlash();
 
     <div class="collapse navbar-collapse" id="navMain">
 
+      <!-- Menu -->
       <ul class="navbar-nav me-auto gap-1 mb-2 mb-lg-0">
         <?php
         $menuItems = [
@@ -107,75 +130,62 @@ $_flash = getFlash();
               href="<?= url($page . '.php') ?>"
             >
               <i class="bi <?= $icon ?> me-1"></i>
+
               <?= e($label) ?>
             </a>
           </li>
         <?php endforeach; ?>
       </ul>
 
-      <!-- Tìm nhanh trên thanh điều hướng -->
-      <div
-        class="position-relative me-2 d-none d-lg-block"
-        style="width:240px"
-      >
-        <input
-          type="text"
-          id="navSearch"
-          class="form-control form-control-sm"
-          placeholder="Tìm nhanh trường, ngành..."
-          autocomplete="off"
-          data-apiurl="<?= url('api/search.php') ?>"
-          data-uniurl="<?= url('university.php') ?>"
-          data-majurl="<?= url('major.php') ?>"
+      <!-- Khu vực nút bên phải -->
+      <div class="d-flex align-items-center gap-2">
+
+        <!-- Dark mode -->
+        <button
+          id="darkBtn"
+          class="btn btn-sm btn-light border"
+          title="Chuyển chế độ sáng/tối"
+          aria-label="Chuyển chế độ sáng/tối"
+          type="button"
         >
+          <i class="bi bi-moon"></i>
+        </button>
 
-        <i
-          class="bi bi-search position-absolute top-50 end-0 translate-middle-y me-2 text-muted"
-          style="pointer-events:none;font-size:12px"
-        ></i>
+        <?php if (isAdmin()): ?>
 
-        <div
-          id="navDrop"
-          class="dropdown-menu w-100 p-0 shadow"
-          style="display:none;max-height:300px;overflow-y:auto;border-radius:10px"
-        ></div>
+          <!-- Trang quản trị -->
+          <a
+            href="<?= url('admin/dashboard.php') ?>"
+            class="btn btn-sm btn-outline-primary"
+          >
+            <i class="bi bi-speedometer2 me-1"></i>
+            Admin
+          </a>
+
+          <!-- Đăng xuất -->
+          <a
+            href="<?= url('logout.php') ?>"
+            class="btn btn-sm btn-outline-danger"
+          >
+            <i class="bi bi-box-arrow-right me-1"></i>
+            Đăng xuất
+          </a>
+
+        <?php else: ?>
+
+          <!-- Đăng nhập -->
+          <a
+            href="<?= url('login.php') ?>"
+            class="btn btn-sm btn-primary px-3"
+          >
+            <i class="bi bi-person-circle me-1"></i>
+            Đăng nhập
+          </a>
+
+        <?php endif; ?>
+
       </div>
-
-      <button
-        id="darkBtn"
-        class="btn btn-sm btn-light border me-2"
-        title="Chuyển chế độ sáng/tối"
-        aria-label="Chuyển chế độ sáng/tối"
-      >
-        <i class="bi bi-moon"></i>
-      </button>
-
-      <?php if (isAdmin()): ?>
-        <a
-          href="<?= url('admin/dashboard.php') ?>"
-          class="btn btn-sm btn-outline-primary me-2"
-        >
-          <i class="bi bi-speedometer2 me-1"></i>
-          Admin
-        </a>
-
-        <a
-          href="<?= url('logout.php') ?>"
-          class="btn btn-sm btn-outline-danger"
-        >
-          <i class="bi bi-box-arrow-right me-1"></i>
-          Đăng xuất
-        </a>
-      <?php else: ?>
-        <a
-          href="<?= url('login.php') ?>"
-          class="btn btn-sm btn-primary px-3"
-        >
-          <i class="bi bi-person-circle me-1"></i>
-          Đăng nhập
-        </a>
-      <?php endif; ?>
-
     </div>
   </div>
 </nav>
+

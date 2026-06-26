@@ -1,11 +1,13 @@
 <?php
-$pageTitle = 'Quản lý trường – Admin';
-require_once '../includes/header.php';
+require_once '../includes/functions.php';
 requireAdmin();
+
+$pageTitle = 'Quản lý trường - Admin';
+require_once '../includes/header.php';
+
 $db  = getDB();
 $act = $_GET['action'] ?? 'list';
 $id  = (int)($_GET['id'] ?? 0);
-
 // Xóa
 if ($act === 'delete' && $id) {
     $db->prepare("DELETE FROM universities WHERE university_id=?")->execute([$id]);

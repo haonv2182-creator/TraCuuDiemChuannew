@@ -1,8 +1,11 @@
 <?php
-$pageTitle = 'Dashboard – Admin DiemChuan.vn';
-require_once '../includes/header.php';
+require_once '../includes/functions.php';
 requireAdmin();
-$db    = getDB();
+
+$pageTitle = 'Dashboard - Admin DiemChuan.vn';
+require_once '../includes/header.php';
+
+$db = getDB();
 $stats = getStats();
 
 $byYear  = $db->query("SELECT year, COUNT(*) AS cnt FROM admission_scores GROUP BY year ORDER BY year")->fetchAll();

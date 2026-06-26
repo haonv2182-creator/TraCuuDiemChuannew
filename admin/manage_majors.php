@@ -1,8 +1,13 @@
 <?php
-$pageTitle = 'Quản lý ngành – Admin';
-require_once '../includes/header.php';
+require_once '../includes/functions.php';
 requireAdmin();
-$db = getDB(); $act = $_GET['action'] ?? 'list'; $id = (int)($_GET['id'] ?? 0);
+
+$pageTitle = 'Quản lý ngành - Admin';
+require_once '../includes/header.php';
+
+$db  = getDB();
+$act = $_GET['action'] ?? 'list';
+$id  = (int)($_GET['id'] ?? 0);
 
 if ($act === 'delete' && $id) {
     $db->prepare("DELETE FROM majors WHERE major_id=?")->execute([$id]);

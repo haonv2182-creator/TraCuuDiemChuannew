@@ -1,8 +1,9 @@
-```php
 <?php
-$pageTitle = 'Quản lý điểm chuẩn – Admin';
-require_once '../includes/header.php';
+require_once '../includes/functions.php';
 requireAdmin();
+
+$pageTitle = 'Quản lý điểm chuẩn - Admin';
+require_once '../includes/header.php';
 
 $db  = getDB();
 $act = $_GET['action'] ?? 'list';
@@ -462,4 +463,3 @@ function admin_method_label($method, $methods)
 </div>
 
 <?php require_once '../includes/footer.php'; ?>
-```

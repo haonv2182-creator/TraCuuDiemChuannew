@@ -1,8 +1,9 @@
-```php
 <?php
-$pageTitle = 'Import CSV – Admin';
-require_once '../includes/header.php';
+require_once '../includes/functions.php';
 requireAdmin();
+
+$pageTitle = 'Import CSV - Admin';
+require_once '../includes/header.php';
 
 $db = getDB();
 
@@ -373,4 +374,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
 </div>
 
 <?php require_once '../includes/footer.php'; ?>
-```
+

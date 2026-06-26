@@ -2395,3 +2395,571 @@ body {
     max-width: 430px !important;
   }
 }
+/* ============================================================
+   FIX CHẾ ĐỘ SÁNG / TỐI
+   DÁN Ở CUỐI CÙNG assets/css/style.css
+   ============================================================ */
+
+/* ---------- CHẾ ĐỘ SÁNG ---------- */
+html[data-theme="light"] body {
+  color: #172033 !important;
+  background: #f7f9fd !important;
+}
+
+html[data-theme="light"] .navbar.sticky-top {
+  color: #172033 !important;
+  background: rgba(255, 255, 255, .96) !important;
+  border-color: #e2e8f0 !important;
+}
+
+html[data-theme="light"] .navbar-brand {
+  color: #2563eb !important;
+}
+
+html[data-theme="light"] .nav-link {
+  color: #475569 !important;
+}
+
+html[data-theme="light"] .nav-link:hover {
+  color: #2563eb !important;
+  background: #eff6ff !important;
+}
+
+html[data-theme="light"] .nav-link.active {
+  color: #2563eb !important;
+  background: #edf4ff !important;
+}
+
+html[data-theme="light"] #darkBtn {
+  color: #6d28d9 !important;
+  background: #ffffff !important;
+  border-color: #ddd6fe !important;
+}
+
+html[data-theme="light"] .card,
+html[data-theme="light"] .filter-card,
+html[data-theme="light"] .stat-card,
+html[data-theme="light"] .uni-card,
+html[data-theme="light"] .home-action-card,
+html[data-theme="light"] .recent-search-section {
+  color: #172033 !important;
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+html[data-theme="light"] .card-header,
+html[data-theme="light"] .card-footer {
+  color: #172033 !important;
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+html[data-theme="light"] .text-dark,
+html[data-theme="light"] h1,
+html[data-theme="light"] h2,
+html[data-theme="light"] h3,
+html[data-theme="light"] h4,
+html[data-theme="light"] h5,
+html[data-theme="light"] h6 {
+  color: #172033 !important;
+}
+
+html[data-theme="light"] .text-muted {
+  color: #64748b !important;
+}
+
+html[data-theme="light"] p,
+html[data-theme="light"] label,
+html[data-theme="light"] small {
+  color: #475569;
+}
+
+html[data-theme="light"] .form-control,
+html[data-theme="light"] .form-select,
+html[data-theme="light"] .input-group-text {
+  color: #172033 !important;
+  background: #ffffff !important;
+  border-color: #d7e2ef !important;
+}
+
+html[data-theme="light"] .form-control::placeholder {
+  color: #94a3b8 !important;
+}
+
+html[data-theme="light"] .table {
+  color: #172033 !important;
+}
+
+html[data-theme="light"] .table td,
+html[data-theme="light"] .table th {
+  color: #172033 !important;
+  border-color: #e2e8f0 !important;
+}
+
+html[data-theme="light"] .table thead th {
+  color: #475569 !important;
+  background: #f8fafc !important;
+}
+
+html[data-theme="light"] .table tbody tr:hover td {
+  background: #f8fafc !important;
+}
+
+html[data-theme="light"] .chip {
+  color: #475569 !important;
+  background: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Hero luôn giữ chữ sáng */
+.hero,
+.hero h1,
+.hero h2,
+.hero h3,
+.hero h4,
+.hero h5,
+.hero h6,
+.hero p,
+.hero .home-hero-label,
+.hero .popular-searches-label,
+.hero .home-hero-stat,
+.hero .home-hero-stat strong,
+.hero .home-hero-stat span {
+  color: #ffffff !important;
+}
+
+.hero .search-hero {
+  background: #ffffff !important;
+}
+
+.hero .search-hero input,
+.hero .search-hero select {
+  color: #172033 !important;
+  background: transparent !important;
+}
+
+.hero .search-hero input::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* ---------- CHẾ ĐỘ TỐI ---------- */
+html[data-theme="dark"] body {
+  color: #e2e8f0 !important;
+  background:
+    radial-gradient(circle at 10% 20%, rgba(37, 99, 235, .12), transparent 24%),
+    #0f172a !important;
+}
+
+html[data-theme="dark"] .navbar.sticky-top {
+  color: #e2e8f0 !important;
+  background: rgba(15, 23, 42, .96) !important;
+  border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .navbar-brand {
+  color: #93c5fd !important;
+}
+
+html[data-theme="dark"] .nav-link {
+  color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] .nav-link:hover {
+  color: #ffffff !important;
+  background: #1e293b !important;
+}
+
+html[data-theme="dark"] .nav-link.active {
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #2563eb, #7c3aed) !important;
+}
+
+html[data-theme="dark"] #darkBtn {
+  color: #f8fafc !important;
+  background: #1e293b !important;
+  border-color: #475569 !important;
+}
+
+html[data-theme="dark"] .card,
+html[data-theme="dark"] .filter-card,
+html[data-theme="dark"] .stat-card,
+html[data-theme="dark"] .uni-card,
+html[data-theme="dark"] .home-action-card,
+html[data-theme="dark"] .recent-search-section {
+  color: #e2e8f0 !important;
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .card-header,
+html[data-theme="dark"] .card-footer {
+  color: #f8fafc !important;
+  background: #172033 !important;
+  border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .text-dark,
+html[data-theme="dark"] h1,
+html[data-theme="dark"] h2,
+html[data-theme="dark"] h3,
+html[data-theme="dark"] h4,
+html[data-theme="dark"] h5,
+html[data-theme="dark"] h6 {
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .text-muted {
+  color: #a5b4c7 !important;
+}
+
+html[data-theme="dark"] p,
+html[data-theme="dark"] label,
+html[data-theme="dark"] small {
+  color: #cbd5e1;
+}
+
+html[data-theme="dark"] .form-control,
+html[data-theme="dark"] .form-select,
+html[data-theme="dark"] .input-group-text {
+  color: #e2e8f0 !important;
+  background: #172033 !important;
+  border-color: #475569 !important;
+}
+
+html[data-theme="dark"] .form-control::placeholder {
+  color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .form-select option {
+  color: #e2e8f0;
+  background: #172033;
+}
+
+html[data-theme="dark"] .table {
+  color: #e2e8f0 !important;
+}
+
+html[data-theme="dark"] .table td,
+html[data-theme="dark"] .table th {
+  color: #e2e8f0 !important;
+  border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .table thead th {
+  color: #cbd5e1 !important;
+  background: #172033 !important;
+}
+
+html[data-theme="dark"] .table tbody tr:hover td {
+  color: #ffffff !important;
+  background: #334155 !important;
+}
+
+html[data-theme="dark"] .chip {
+  color: #dbeafe !important;
+  background: #263449 !important;
+  border-color: #475569 !important;
+}
+
+html[data-theme="dark"] .page-link {
+  color: #bfdbfe !important;
+  background: #1e293b !important;
+  border-color: #475569 !important;
+}
+
+html[data-theme="dark"] .page-item.active .page-link {
+  color: #ffffff !important;
+  background: #2563eb !important;
+}
+
+html[data-theme="dark"] .dropdown-menu {
+  color: #e2e8f0 !important;
+  background: #172033 !important;
+  border-color: #475569 !important;
+}
+
+html[data-theme="dark"] .dropdown-item {
+  color: #e2e8f0 !important;
+}
+
+html[data-theme="dark"] .dropdown-item:hover {
+  color: #ffffff !important;
+  background: #334155 !important;
+}
+
+/* Giữ ô tìm kiếm hero sáng ở cả hai chế độ */
+html[data-theme="dark"] .hero .search-hero {
+  background: #ffffff !important;
+  border-color: rgba(255, 255, 255, .75) !important;
+}
+
+html[data-theme="dark"] .hero .search-hero input,
+html[data-theme="dark"] .hero .search-hero select {
+  color: #172033 !important;
+  background: transparent !important;
+}
+
+html[data-theme="dark"] .hero .search-hero input::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Admin */
+html[data-theme="dark"] .admin-content {
+  color: #e2e8f0 !important;
+  background: #0f172a !important;
+}
+
+html[data-theme="dark"] .admin-content .bg-white {
+  color: #e2e8f0 !important;
+  background: #1e293b !important;
+}
+
+html[data-theme="dark"] .admin-content .border {
+  border-color: #334155 !important;
+}
+
+/* Footer luôn nền tối, chữ sáng */
+footer,
+footer p,
+footer span,
+footer small,
+footer a,
+footer h1,
+footer h2,
+footer h3,
+footer h4,
+footer h5,
+footer h6 {
+  color: #e2e8f0 !important;
+}
+/* ============================================================
+   FIX RIÊNG CHO TRANG SO SÁNH Ở DARK MODE
+   Dán ở CUỐI CÙNG style.css
+   ============================================================ */
+
+html[data-theme="dark"] .table,
+html[data-theme="dark"] table {
+  color: #e2e8f0 !important;
+  background: transparent !important;
+}
+
+html[data-theme="dark"] .table > :not(caption) > * > *,
+html[data-theme="dark"] table > :not(caption) > * > * {
+  color: #e2e8f0 !important;
+  background: #172033 !important;
+  border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .table thead th,
+html[data-theme="dark"] table thead th {
+  color: #f8fafc !important;
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .table tbody td,
+html[data-theme="dark"] table tbody td {
+  color: #e2e8f0 !important;
+  background: #172033 !important;
+}
+
+html[data-theme="dark"] .table tbody tr:hover td,
+html[data-theme="dark"] table tbody tr:hover td {
+  color: #ffffff !important;
+  background: #243247 !important;
+}
+
+html[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > *,
+html[data-theme="dark"] table.table-striped > tbody > tr:nth-of-type(odd) > * {
+  background: #152033 !important;
+}
+
+html[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) > *,
+html[data-theme="dark"] table.table-striped > tbody > tr:nth-of-type(even) > * {
+  background: #172033 !important;
+}
+
+/* card chứa bảng */
+html[data-theme="dark"] .card,
+html[data-theme="dark"] .filter-card,
+html[data-theme="dark"] .stat-card,
+html[data-theme="dark"] .compare-card,
+html[data-theme="dark"] .compare-table-card,
+html[data-theme="dark"] .compare-info-card,
+html[data-theme="dark"] .compare-chart-card {
+  color: #e2e8f0 !important;
+  background: #111827 !important;
+  border-color: #334155 !important;
+}
+
+/* nếu có bg trắng hoặc bg sáng bị sót trong trang compare */
+html[data-theme="dark"] .bg-white,
+html[data-theme="dark"] .bg-light {
+  color: #e2e8f0 !important;
+  background: #172033 !important;
+}
+
+/* tiêu đề trong các khối compare */
+html[data-theme="dark"] .card-header,
+html[data-theme="dark"] .compare-card .card-header,
+html[data-theme="dark"] .compare-table-card .card-header,
+html[data-theme="dark"] .compare-info-card .card-header,
+html[data-theme="dark"] .compare-chart-card .card-header {
+  color: #f8fafc !important;
+  background: #0f172a !important;
+  border-color: #334155 !important;
+}
+
+/* text muted trong bảng */
+html[data-theme="dark"] .table .text-muted,
+html[data-theme="dark"] table .text-muted {
+  color: #94a3b8 !important;
+}
+
+/* ô highlight chênh lệch */
+html[data-theme="dark"] .text-success {
+  color: #4ade80 !important;
+}
+
+html[data-theme="dark"] .text-danger {
+  color: #f87171 !important;
+}
+/* ============================================================
+   FIX TRANG SO SÁNH BỊ THỤT VÀO TRONG
+   ============================================================ */
+
+.compare-page {
+  width: 100% !important;
+  max-width: 1450px !important;
+  padding-top: 36px !important;
+  padding-right: 24px !important;
+  padding-left: 24px !important;
+}
+
+.compare-heading {
+  margin-bottom: 24px !important;
+}
+
+.compare-control-card {
+  width: 100% !important;
+  border-radius: 20px !important;
+}
+
+.compare-control-card .card-body {
+  padding: 32px 38px !important;
+}
+
+/* Các ô chọn rộng và cân đối */
+.compare-control-card .form-select {
+  min-height: 48px;
+}
+
+/* Giảm khoảng trống giữa tiêu đề và form */
+.compare-page.py-5 {
+  padding-top: 38px !important;
+}
+
+/* Màn hình lớn */
+@media (min-width: 1400px) {
+  .compare-page {
+    max-width: 1450px !important;
+  }
+}
+
+/* Laptop */
+@media (max-width: 1399px) {
+  .compare-page {
+    max-width: 1240px !important;
+  }
+
+  .compare-control-card .card-body {
+    padding: 28px !important;
+  }
+}
+
+/* Điện thoại */
+@media (max-width: 767px) {
+  .compare-page {
+    padding-right: 14px !important;
+    padding-left: 14px !important;
+  }
+
+  .compare-control-card .card-body {
+    padding: 20px !important;
+  }
+}
+/* ============================================================
+   TRANG SO SÁNH GIỐNG BỐ CỤC TRANG GỢI Ý
+   ============================================================ */
+
+.compare-page {
+  max-width: 100% !important;
+  padding-top: 42px !important;
+  padding-bottom: 55px !important;
+}
+
+.compare-page > .row {
+  margin: 0 !important;
+}
+
+.compare-page .col-xl-10 {
+  max-width: 1100px;
+}
+
+.compare-control-card {
+  width: 100%;
+  border-radius: 20px !important;
+  border: 1px solid rgba(148, 163, 184, .22) !important;
+  box-shadow:
+    0 12px 32px rgba(15, 23, 42, .08),
+    0 3px 10px rgba(15, 23, 42, .04) !important;
+}
+
+.compare-control-card .card-body {
+  padding: 28px !important;
+}
+
+.compare-control-card .form-select {
+  min-height: 48px;
+  border-radius: 13px;
+}
+
+.compare-control-card .btn-primary {
+  min-height: 48px;
+  border-radius: 13px;
+}
+
+.compare-vs-badge {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  color: #475569;
+  border: 1px solid #dbe5f2;
+  border-radius: 50%;
+  background: #f8fafc;
+  font-weight: 700;
+}
+
+.compare-summary-card,
+.compare-chart-card,
+.compare-table-card,
+.compare-stat {
+  border-radius: 18px !important;
+}
+
+@media (max-width: 767px) {
+  .compare-page {
+    padding-top: 30px !important;
+    padding-right: 12px !important;
+    padding-left: 12px !important;
+  }
+
+  .compare-control-card .card-body {
+    padding: 20px !important;
+  }
+
+  .compare-vs-badge {
+    margin: 4px auto;
+  }
+}

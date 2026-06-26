@@ -319,21 +319,28 @@ $latestDifference = (
 <div class="container py-5 compare-page">
 
     <!-- Tiêu đề -->
-    <div class="compare-heading mb-4">
-        <span class="compare-kicker"><i class="bi bi-stars"></i> Công cụ đối chiếu</span>
-        <h2 class="fw-bold mb-2">
-            <i class="bi bi-bar-chart-line me-2 text-primary"></i>
-            So sánh điểm chuẩn
-        </h2>
+    <div class="container py-5 compare-page">
+    <div class="row justify-content-center">
+        <div class="col-xl-10">
 
-        <p class="text-muted mb-0">
-            So sánh cùng ngành và cùng phương thức xét tuyển giữa hai trường
-        </p>
-    </div>
+            <div class="text-center mb-4">
+                <span class="section-label">
+                    Công cụ đối chiếu
+                </span>
+
+                <h2 class="fw-bold mt-2 mb-2">
+                    <i class="bi bi-bar-chart-line text-primary me-2"></i>
+                    So sánh điểm chuẩn
+                </h2>
+
+                <p class="text-muted mb-0">
+                    So sánh cùng ngành và cùng phương thức xét tuyển giữa hai trường
+                </p>
+            </div>
 
     <!-- Form chọn dữ liệu -->
-    <div class="card mb-4 compare-control-card">
-        <div class="card-body p-4 p-lg-5">
+    <div class="card shadow-sm mb-4 compare-control-card">
+        <div class="card-body p-4">
         <form method="GET" id="compareForm">
 
             <div class="row g-3">
@@ -915,5 +922,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     </script>
 <?php endif; ?>
-
+        </div>
+    </div>
 <?php require_once 'includes/footer.php'; ?>

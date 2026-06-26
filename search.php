@@ -4,7 +4,6 @@ require_once 'includes/header.php';
 
 $db = getDB();
 
-// ── Tham số bộ lọc ───────────────────────────────────────────
 $q          = trim((string)($_GET['q'] ?? ''));
 $major      = trim((string)($_GET['major'] ?? ''));
 $year       = (int)($_GET['year'] ?? 0);
@@ -51,7 +50,6 @@ function search_method_color(string $value): string
     return $colors[$value] ?? 'secondary';
 }
 
-// ── Sắp xếp an toàn bằng whitelist ───────────────────────────
 $sortOptions = [
     'year_desc'  => [
         'label' => 'Năm mới nhất',
@@ -68,10 +66,6 @@ $sortOptions = [
     'school_asc' => [
         'label' => 'Tên trường A–Z',
         'sql'   => 'u.university_name ASC, s.year DESC, s.score DESC'
-    ],
-    'quota_desc' => [
-        'label' => 'Chỉ tiêu cao đến thấp',
-        'sql'   => 's.quota DESC, s.year DESC, s.score DESC'
     ]
 ];
 
@@ -81,7 +75,6 @@ if (!isset($sortOptions[$sort])) {
 
 $orderSql = $sortOptions[$sort]['sql'];
 
-// ── Xây dựng điều kiện truy vấn ──────────────────────────────
 $where  = ['1 = 1'];
 $params = [];
 
@@ -157,14 +150,12 @@ $fromSql = "
     WHERE {$whereSql}
 ";
 
-// ── Đếm kết quả ──────────────────────────────────────────────
 $countStmt = $db->prepare("SELECT COUNT(*) {$fromSql}");
 $countStmt->execute($params);
 $totalRows = (int)$countStmt->fetchColumn();
 
 $pagination = paginate($totalRows, $limit, $page);
 
-// ── Lấy dữ liệu ──────────────────────────────────────────────
 $dataSql = "
     SELECT
         s.score_id,
@@ -197,7 +188,6 @@ $stmt->execute();
 
 $rows = $stmt->fetchAll();
 
-// ── Dữ liệu cho các dropdown ─────────────────────────────────
 $allMajors = $db->query("
     SELECT major_name
     FROM majors
@@ -242,7 +232,6 @@ $hasFilter =
     || $latestOnly
     || $sort !== 'year_desc';
 
-// ── Các chip bộ lọc đang bật ─────────────────────────────────
 $activeFilters = [];
 
 if ($q !== '') {
@@ -330,19 +319,9 @@ if ($latestOnly) {
         </h4>
 
         <p class="text-muted small mb-0">
-          Lọc điểm chuẩn theo trường, ngành, năm, tổ hợp, phương thức và nhiều tiêu chí khác
+          Lọc điểm chuẩn theo trường, ngành, năm và phương thức xét tuyển
         </p>
       </div>
-
-      <?php if ($hasFilter): ?>
-        <a
-          href="<?= url('search.php') ?>"
-          class="btn btn-outline-secondary btn-sm"
-        >
-          <i class="bi bi-x-circle me-1"></i>
-          Xóa tất cả bộ lọc
-        </a>
-      <?php endif; ?>
 
     </div>
   </div>
@@ -350,10 +329,6 @@ if ($latestOnly) {
 
 <div class="container py-4">
   <div class="row g-4">
-
-    <!-- ══════════════════════════════════════════════════════ -->
-    <!-- CỘT BỘ LỌC -->
-    <!-- ══════════════════════════════════════════════════════ -->
     <div class="col-lg-3">
       <div style="position:sticky;top:76px">
 
@@ -397,7 +372,7 @@ if ($latestOnly) {
 
             <select
               name="major"
-              class="form-select form-select-sm js-auto-submit"
+              class="form-select form-select-sm"
             >
               <option value="">Tất cả ngành</option>
 
@@ -421,7 +396,7 @@ if ($latestOnly) {
 
             <select
               name="year"
-              class="form-select form-select-sm js-auto-submit"
+              class="form-select form-select-sm"
             >
               <option value="0">Tất cả năm</option>
 
@@ -439,7 +414,7 @@ if ($latestOnly) {
           <!-- Chỉ dữ liệu mới nhất -->
           <div class="form-check form-switch mb-3">
             <input
-              class="form-check-input js-auto-submit"
+              class="form-check-input"
               type="checkbox"
               role="switch"
               id="latestOnly"
@@ -469,7 +444,7 @@ if ($latestOnly) {
 
             <select
               name="combo"
-              class="form-select form-select-sm js-auto-submit"
+              class="form-select form-select-sm"
             >
               <option value="">Tất cả tổ hợp</option>
 
@@ -493,7 +468,7 @@ if ($latestOnly) {
 
             <select
               name="method"
-              class="form-select form-select-sm js-auto-submit"
+              class="form-select form-select-sm"
             >
               <option value="">Tất cả phương thức</option>
 
@@ -521,7 +496,7 @@ if ($latestOnly) {
                 name="min"
                 value="<?= $minScore > 0 ? e($minScore) : '' ?>"
                 placeholder="Từ"
-                class="form-control form-control-sm js-number-filter"
+                class="form-control form-control-sm"
                 min="0"
                 max="1200"
                 step="0.01"
@@ -532,7 +507,7 @@ if ($latestOnly) {
                 name="max"
                 value="<?= $maxScore > 0 ? e($maxScore) : '' ?>"
                 placeholder="Đến"
-                class="form-control form-control-sm js-number-filter"
+                class="form-control form-control-sm"
                 min="0"
                 max="1200"
                 step="0.01"
@@ -549,7 +524,7 @@ if ($latestOnly) {
 
             <select
               name="province"
-              class="form-select form-select-sm js-auto-submit"
+              class="form-select form-select-sm"
             >
               <option value="">Tất cả tỉnh thành</option>
 
@@ -573,7 +548,7 @@ if ($latestOnly) {
 
             <select
               name="school_type"
-              class="form-select form-select-sm js-auto-submit"
+              class="form-select form-select-sm"
             >
               <option value="">Tất cả loại trường</option>
 
@@ -597,7 +572,7 @@ if ($latestOnly) {
 
             <select
               name="sort"
-              class="form-select form-select-sm js-auto-submit"
+              class="form-select form-select-sm"
             >
               <?php foreach ($sortOptions as $sortValue => $sortItem): ?>
                 <option
@@ -615,7 +590,7 @@ if ($latestOnly) {
             class="btn btn-primary w-100 fw-semibold"
           >
             <i class="bi bi-funnel me-1"></i>
-            Áp dụng bộ lọc
+            Tìm kiếm
           </button>
 
           <?php if ($hasFilter): ?>
@@ -630,10 +605,6 @@ if ($latestOnly) {
         </form>
       </div>
     </div>
-
-    <!-- ══════════════════════════════════════════════════════ -->
-    <!-- CỘT KẾT QUẢ -->
-    <!-- ══════════════════════════════════════════════════════ -->
     <div class="col-lg-9">
 
       <?php if (!empty($activeFilters)): ?>
@@ -907,44 +878,5 @@ if ($latestOnly) {
   color: #cbd5e1;
 }
 </style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  const form = document.getElementById('filterForm');
-
-  if (!form) {
-    return;
-  }
-
-  let typingTimer = null;
-
-  function submitFilterForm() {
-    const pageInput = form.querySelector('input[name="page"]');
-
-    if (pageInput) {
-      pageInput.value = '1';
-    }
-
-    form.submit();
-  }
-
-  form.querySelectorAll('.js-auto-submit').forEach(function (element) {
-    element.addEventListener('change', submitFilterForm);
-  });
-
-  form.querySelectorAll('.js-number-filter').forEach(function (input) {
-    input.addEventListener('change', submitFilterForm);
-  });
-
-  const schoolInput = form.querySelector('input[name="q"]');
-
-  if (schoolInput) {
-    schoolInput.addEventListener('input', function () {
-      clearTimeout(typingTimer);
-      typingTimer = setTimeout(submitFilterForm, 650);
-    });
-  }
-});
-</script>
 
 <?php require_once 'includes/footer.php'; ?>

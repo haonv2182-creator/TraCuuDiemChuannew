@@ -1,22 +1,82 @@
 <?php
+
 // ============================================================
-//  includes/config.php — Tự động tính BASE_URL theo subfolder
-//  Chạy ở localhost/TRACUUDIEMCHUAN/ hay localhost/ đều OK
+// includes/config.php
+// Tự động xác định BASE_URL cho cả localhost và hosting
 // ============================================================
 
-$_root = str_replace('\\', '/', realpath(__DIR__ . '/..'));
-$_doc  = str_replace('\\', '/', realpath($_SERVER['DOCUMENT_ROOT']));
-$_rel  = str_replace($_doc, '', $_root);
+$documentRoot = realpath($_SERVER['DOCUMENT_ROOT'] ?? '');
+$projectRoot  = realpath(__DIR__ . '/..');
 
-define('BASE_URL', rtrim(str_replace('\\','/',$_rel), '/'));
+$documentRoot = $documentRoot
+    ? str_replace('\\', '/', $documentRoot)
+    : '';
 
-/** Tạo URL từ path tương đối trong project */
-function url(string $path = ''): string {
-    return BASE_URL . '/' . ltrim($path, '/');
+$projectRoot = $projectRoot
+    ? str_replace('\\', '/', $projectRoot)
+    : '';
+
+$baseUrl = '';
+
+if ($documentRoot !== '' && $projectRoot !== '') {
+    if (str_starts_with($projectRoot, $documentRoot)) {
+        $baseUrl = substr(
+            $projectRoot,
+            strlen($documentRoot)
+        );
+    }
 }
 
-/** Redirect theo path project */
-function redirect(string $path): void {
+$baseUrl = str_replace('\\', '/', $baseUrl);
+$baseUrl = '/' . trim($baseUrl, '/');
+
+/*
+|--------------------------------------------------------------------------
+| Nếu project nằm trực tiếp trong htdocs/public_html
+|--------------------------------------------------------------------------
+| BASE_URL sẽ là chuỗi rỗng.
+|
+| Ví dụ:
+| https://tracuudiemchuan.infinityfree.me/
+|--------------------------------------------------------------------------
+*/
+
+if ($baseUrl === '/') {
+    $baseUrl = '';
+}
+
+define('BASE_URL', $baseUrl);
+
+/**
+ * Tạo URL từ đường dẫn tương đối trong project.
+ *
+ * Ví dụ:
+ * url('assets/css/style.css')
+ * url('admin/dashboard.php')
+ */
+function url(string $path = ''): string
+{
+    $path = ltrim($path, '/');
+
+    if ($path === '') {
+        return BASE_URL !== ''
+            ? BASE_URL . '/'
+            : '/';
+    }
+
+    return BASE_URL . '/' . $path;
+}
+
+/**
+ * Chuyển hướng tới đường dẫn trong project.
+ *
+ * Ví dụ:
+ * redirect('index.php');
+ * redirect('admin/dashboard.php');
+ */
+function redirect(string $path): void
+{
     header('Location: ' . url($path));
     exit;
 }
+

@@ -426,23 +426,6 @@ $stats = $statsStmt->fetch();
             <td><?= e($stats['latest_year'] ?? '—') ?></td>
           </tr>
 
-          <tr>
-            <td class="text-muted">Điểm cao nhất</td>
-            <td class="fw-bold text-primary">
-              <?= $stats['max_score'] !== null
-                  ? number_format((float)$stats['max_score'], 2)
-                  : '—' ?>
-            </td>
-          </tr>
-
-          <tr>
-            <td class="text-muted">Điểm thấp nhất</td>
-            <td>
-              <?= $stats['min_score'] !== null
-                  ? number_format((float)$stats['min_score'], 2)
-                  : '—' ?>
-            </td>
-          </tr>
         </table>
       </div>
 

@@ -2963,3 +2963,100 @@ html[data-theme="dark"] .text-danger {
     margin: 4px auto;
   }
 }
+/* ============================================================
+   ĐỒNG BỘ MÀU CARD TRƯỜNG / NGÀNH
+   Giữ giao diện cũ, chỉ đổi màu các ô về cùng 1 tông
+   ============================================================ */
+
+/* Card trường + ngành */
+.uni-card,
+#featured-universities .row > [class*="col"] .uni-card,
+#featured-majors .row > [class*="col"] .uni-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px !important;
+  border: 1px solid #dbeafe !important;
+  background:
+    radial-gradient(circle at 92% 88%, rgba(37, 99, 235, .14), transparent 35%),
+    linear-gradient(145deg, #ffffff 0%, #f5f9ff 100%) !important;
+  box-shadow:
+    0 10px 24px rgba(15, 23, 42, .08),
+    0 2px 6px rgba(15, 23, 42, .04) !important;
+}
+
+/* Thanh màu phía trên card */
+.uni-card::before,
+#featured-universities .row > [class*="col"] .uni-card::before,
+#featured-majors .row > [class*="col"] .uni-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 5px !important;
+  width: 100%;
+  background: linear-gradient(90deg, #2563eb, #06b6d4) !important;
+}
+
+/* Vòng sáng bên phải */
+.uni-card::after,
+#featured-universities .row > [class*="col"] .uni-card::after,
+#featured-majors .row > [class*="col"] .uni-card::after {
+  content: "";
+  position: absolute;
+  right: -55px;
+  bottom: -60px;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: rgba(37, 99, 235, .10) !important;
+  z-index: 0;
+}
+
+/* Nội dung nằm trên nền trang trí */
+.uni-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Logo viết tắt */
+.uni-logo,
+#featured-universities .row > [class*="col"] .uni-logo,
+#featured-majors .row > [class*="col"] .uni-logo {
+  color: #4338ca !important;
+  background: #f4f6ff !important;
+  border: 1px solid #e0e7ff !important;
+  box-shadow: none !important;
+}
+
+/* Chữ trong card */
+.uni-card .fw-bold,
+.uni-card h5,
+.uni-card h6 {
+  color: #172033 !important;
+}
+
+.uni-card .text-muted,
+.uni-card small {
+  color: #64748b !important;
+}
+
+/* Chip như “28 ngành”, “Công lập” */
+.uni-card .chip,
+.uni-card .badge,
+.uni-card span[class*="badge"] {
+  color: #64748b !important;
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: none !important;
+}
+
+/* Hover nhẹ thôi, không đổi sang màu khác */
+.uni-card:hover,
+#featured-universities .row > [class*="col"] .uni-card:hover,
+#featured-majors .row > [class*="col"] .uni-card:hover {
+  border-color: #bfdbfe !important;
+  box-shadow:
+    0 14px 30px rgba(15, 23, 42, .10),
+    0 3px 8px rgba(15, 23, 42, .05) !important;
+  transform: translateY(-4px) !important;
+}

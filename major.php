@@ -236,12 +236,6 @@ $trendSchools = array_values(array_unique(array_column($trend, 'university_name'
           <span class="chip">
             <?= number_format((int)($stats['university_count'] ?? 0)) ?> trường có dữ liệu
           </span>
-
-          <?php if ($stats['max_score'] !== null): ?>
-            <span class="score-badge sb-hi">
-              Cao nhất: <?= number_format((float)$stats['max_score'], 2) ?>
-            </span>
-          <?php endif; ?>
         </div>
       </div>
 
@@ -494,24 +488,6 @@ $trendSchools = array_values(array_unique(array_column($trend, 'university_name'
           <tr>
             <td class="text-muted">Năm mới nhất</td>
             <td><?= e($stats['latest_year'] ?? '—') ?></td>
-          </tr>
-
-          <tr>
-            <td class="text-muted">Điểm cao nhất</td>
-            <td class="fw-bold text-primary">
-              <?= $stats['max_score'] !== null
-                  ? number_format((float)$stats['max_score'], 2)
-                  : '—' ?>
-            </td>
-          </tr>
-
-          <tr>
-            <td class="text-muted">Điểm thấp nhất</td>
-            <td>
-              <?= $stats['min_score'] !== null
-                  ? number_format((float)$stats['min_score'], 2)
-                  : '—' ?>
-            </td>
           </tr>
         </table>
 

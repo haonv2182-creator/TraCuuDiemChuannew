@@ -44,13 +44,17 @@ $aiLogs  = $db->query("SELECT * FROM ai_logs ORDER BY created_at DESC LIMIT 6")-
       <div class="col-md-7">
         <div class="card">
           <div class="card-header"><i class="bi bi-bar-chart me-1"></i>Bản ghi điểm theo năm</div>
-          <div class="card-body p-3"><canvas id="cYear" height="160"></canvas></div>
+          <div class="card-body p-3" style="height:260px">
+            <canvas id="cYear"></canvas>
+          </div>
         </div>
       </div>
       <div class="col-md-5">
         <div class="card">
           <div class="card-header"><i class="bi bi-pie-chart me-1"></i>Phân bố theo tỉnh/thành</div>
-          <div class="card-body p-3"><canvas id="cRegion" height="160"></canvas></div>
+          <div class="card-body p-3" style="height:260px">
+            <canvas id="cRegion"></canvas>
+          </div>
         </div>
       </div>
     </div>
@@ -98,15 +102,67 @@ $aiLogs  = $db->query("SELECT * FROM ai_logs ORDER BY created_at DESC LIMIT 6")-
 </div>
 
 <script>
-chartBar('cYear',
-  <?= json_encode(array_column($byYear, 'year')) ?>,
-  <?= json_encode(array_column($byYear, 'cnt')) ?>,
-  'Số bản ghi'
-);
-chartDoughnut('cRegion',
-  <?= json_encode(array_column($byRegion, 'province'), JSON_UNESCAPED_UNICODE) ?>,
-  <?= json_encode(array_column($byRegion, 'cnt')) ?>
-);
-</script>
+window.addEventListener('load', function () {
+  const yearCanvas = document.getElementById('cYear');
+  const regionCanvas = document.getElementById('cRegion');
 
-<?php require_once '../includes/footer.php'; ?>
+  if (yearCanvas && typeof Chart !== 'undefined') {
+    new Chart(yearCanvas, {
+      type: 'bar',
+      data: {
+        labels: <?= json_encode(array_column($byYear, 'year')) ?>,
+        datasets: [{
+          label: 'Số bản ghi',
+          data: <?= json_encode(array_column($byYear, 'cnt')) ?>,
+          backgroundColor: 'rgba(37, 99, 235, 0.8)',
+          borderRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  }
+
+  if (regionCanvas && typeof Chart !== 'undefined') {
+    new Chart(regionCanvas, {
+      type: 'doughnut',
+      data: {
+        labels: <?= json_encode(array_column($byRegion, 'province'), JSON_UNESCAPED_UNICODE) ?>,
+        datasets: [{
+          data: <?= json_encode(array_column($byRegion, 'cnt')) ?>,
+          backgroundColor: [
+            '#2563eb',
+            '#06b6d4',
+            '#10b981',
+            '#f59e0b',
+            '#8b5cf6',
+            '#64748b'
+          ],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }
+    });
+  }
+});
+</script>

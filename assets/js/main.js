@@ -1209,3 +1209,68 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 300);
   }
 });
+// ============================================================
+// GỢI Ý TRƯỜNG Ở TRANG TRA CỨU NÂNG CAO
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  const advancedInput = document.querySelector('form input[name="q"]');
+
+  if (!advancedInput || advancedInput.id === 'heroUniversityInput') return;
+
+  const suggestBox = document.createElement('div');
+  suggestBox.className = 'advanced-suggest-box';
+  advancedInput.parentElement.style.position = 'relative';
+  advancedInput.parentElement.appendChild(suggestBox);
+
+  let timer = null;
+
+  advancedInput.addEventListener('input', () => {
+    clearTimeout(timer);
+
+    const q = advancedInput.value.trim();
+
+    if (q.length < 2) {
+      suggestBox.style.display = 'none';
+      suggestBox.innerHTML = '';
+      return;
+    }
+
+    timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`api/search.php?q=${encodeURIComponent(q)}`);
+        const data = await res.json();
+
+        const universities = data.universities || [];
+
+        if (universities.length === 0) {
+          suggestBox.style.display = 'none';
+          return;
+        }
+
+        suggestBox.innerHTML = universities.map(u => `
+          <button type="button" class="advanced-suggest-item" data-name="${u.name}">
+            <span>${u.name}</span>
+            <small>${u.province || ''}</small>
+          </button>
+        `).join('');
+
+        suggestBox.style.display = 'block';
+
+        suggestBox.querySelectorAll('.advanced-suggest-item').forEach(btn => {
+          btn.addEventListener('click', () => {
+            advancedInput.value = btn.dataset.name || '';
+            suggestBox.style.display = 'none';
+          });
+        });
+      } catch (e) {
+        suggestBox.style.display = 'none';
+      }
+    }, 250);
+  });
+
+  document.addEventListener('click', e => {
+    if (!advancedInput.contains(e.target) && !suggestBox.contains(e.target)) {
+      suggestBox.style.display = 'none';
+    }
+  });
+});

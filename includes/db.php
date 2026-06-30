@@ -11,10 +11,10 @@ if ($isLocal) {
     define('DB_USER', 'root');
     define('DB_PASS', '');
 } else {
-    define('DB_HOST', 'sql308.infinityfree.com');
-    define('DB_NAME', 'if0_42277694_diemchuan');
-    define('DB_USER', 'if0_42277694');
-    define('DB_PASS', 'MẬT_KHẨU_VISTAPANEL_CỦA_BẠN');
+    define('DB_HOST', getenv('DB_HOST') ?: '');
+    define('DB_NAME', getenv('DB_NAME') ?: '');
+    define('DB_USER', getenv('DB_USER') ?: '');
+    define('DB_PASS', getenv('DB_PASS') ?: '');
 }
 
 function getDB(): PDO
@@ -52,6 +52,9 @@ function getDB(): PDO
                 ">
                     <h2>⚠️ Lỗi kết nối Database</h2>
                     <p>Website hiện không thể kết nối với cơ sở dữ liệu.</p>
+                    <p style="font-size:13px;color:#7f1d1d">
+                        Vui lòng kiểm tra biến môi trường DB_HOST, DB_NAME, DB_USER, DB_PASS.
+                    </p>
                 </div>'
             );
         }

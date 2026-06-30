@@ -1,36 +1,36 @@
 <?php
 // ============================================================
-//  login.php — Đăng nhập Admin (dùng MD5)
+//  login.php — Đăng nhập Admin
 // ============================================================
 require_once 'includes/functions.php';
+
 startSession();
-if (isAdmin()) redirect('admin/dashboard.php');
+
+if (isAdmin()) {
+    redirect('admin/dashboard.php');
+}
 
 $err = '';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user = trim($_POST['username'] ?? '');
     $pass = trim($_POST['password'] ?? '');
-    if ($user && $pass) {
-        $db   = getDB();
+
+    if ($user !== '' && $pass !== '') {
+        $db = getDB();
+
         $stmt = $db->prepare("SELECT * FROM users WHERE username = ? LIMIT 1");
         $stmt->execute([$user]);
-        $row  = $stmt->fetch();
-        if ($row) {
-            $ok = false;
-            // Thử MD5
-            if (md5($pass) === $row['password']) $ok = true;
-            // Thử bcrypt
-            if (!$ok && password_verify($pass, $row['password'])) $ok = true;
-            // Thử plain text (phòng trường hợp)
-            if (!$ok && $pass === $row['password']) $ok = true;
+        $row = $stmt->fetch();
 
-            if ($ok) {
-                $_SESSION['user_id']  = $row['user_id'];
-                $_SESSION['username'] = $row['username'];
-                $_SESSION['role']     = $row['role'];
-                redirect('admin/dashboard.php');
-            }
+        if ($row && checkPassword($pass, $row['password'])) {
+            $_SESSION['user_id']  = $row['user_id'];
+            $_SESSION['username'] = $row['username'];
+            $_SESSION['role']     = $row['role'];
+
+            redirect('admin/dashboard.php');
         }
+
         $err = 'Sai tài khoản hoặc mật khẩu!';
     } else {
         $err = 'Vui lòng điền đầy đủ!';
@@ -71,6 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                    value="admin" required autofocus>
           </div>
         </div>
+
         <div class="mb-4">
           <label class="form-label fw-semibold">Mật khẩu</label>
           <div class="input-group">
@@ -83,18 +84,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </button>
           </div>
         </div>
+
         <button type="submit" class="btn btn-primary w-100 fw-bold py-2 fs-5">
           <i class="bi bi-box-arrow-in-right me-1"></i>Đăng nhập
         </button>
       </form>
 
-      <hr class="my-3">
-      <div class="text-center">
-        <p class="small text-muted mb-2">Nếu vẫn không đăng nhập được:</p>
-        <a href="check_login.php" class="btn btn-warning btn-sm w-100">
-          🔧 Mở check_login.php để đặt lại mật khẩu
-        </a>
-      </div>
       <div class="text-center mt-3">
         <a href="<?= url('index.php') ?>" class="small text-muted">
           <i class="bi bi-arrow-left me-1"></i>Về trang chủ
@@ -103,6 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
   </div>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

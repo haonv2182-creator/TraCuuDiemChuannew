@@ -3764,3 +3764,118 @@ h1, h2, h3, h4, h5 {
   background: #172033 !important;
   border-color: #334155 !important;
 }
+:root {
+  --primary: #4f46e5;
+  --primary-dk: #3730a3;
+  --primary-lt: #eef2ff;
+  --dc-accent: #4f46e5;
+  --dc-accent-dark: #3730a3;
+  --dc-accent-soft: #eef2ff;
+  --radius: 14px;
+  --shadow: 0 8px 26px rgba(15, 23, 42, .06);
+  --bs-primary: #4f46e5;
+  --bs-primary-rgb: 79, 70, 229;
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, rgba(79, 70, 229, .06), transparent 30%),
+    var(--gray-50);
+}
+
+.hero,
+.home-hero {
+  background: linear-gradient(180deg, var(--dc-accent) 0%, var(--dc-accent-dark) 100%) !important;
+}
+
+.home-gradient-text {
+  background: none !important;
+  color: #fff !important;
+}
+
+.card,
+.filter-card,
+.stat-card,
+.uni-card,
+.home-action-card,
+.recent-search-section {
+  border: 1px solid #e9ecf2 !important;
+  border-radius: 16px !important;
+  box-shadow: var(--shadow) !important;
+}
+
+.uni-card:hover,
+.home-action-card:hover {
+  border-color: rgba(79, 70, 229, .35) !important;
+  box-shadow: 0 12px 32px rgba(79, 70, 229, .12) !important;
+}
+
+.uni-logo,
+.stat-card .s-icon,
+.home-stat-icon,
+.empty-state-icon {
+  background: var(--dc-accent-soft) !important;
+  color: var(--dc-accent-dark) !important;
+}
+
+.form-control,
+.form-select,
+.input-group-text {
+  border-color: #e5e7eb;
+  border-radius: 12px;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--dc-accent);
+  box-shadow: 0 0 0 .2rem rgba(79, 70, 229, .12);
+}
+
+.btn {
+  border-radius: 999px;
+}
+
+.btn-primary,
+.btn-outline-primary:hover,
+.page-item.active .page-link {
+  background: var(--dc-accent) !important;
+  border-color: var(--dc-accent) !important;
+}
+
+.btn-primary:hover {
+  background: var(--dc-accent-dark) !important;
+  border-color: var(--dc-accent-dark) !important;
+}
+
+.btn-outline-primary,
+.page-link {
+  color: var(--dc-accent);
+  border-color: var(--dc-accent);
+}
+
+.table thead th {
+  background: #f8fafc !important;
+  color: #64748b !important;
+}
+
+.table tbody tr:hover td {
+  background: #f8fafc !important;
+}
+
+.chip,
+.score-badge,
+.badge {
+  border-radius: 999px;
+}
+
+.sb-mid,
+.tag-fit {
+  background: var(--dc-accent-soft) !important;
+  color: var(--dc-accent-dark) !important;
+}
+
+.admin-content {
+  background:
+    radial-gradient(circle at top left, rgba(79, 70, 229, .05), transparent 28%),
+    var(--gray-50) !important;
+}

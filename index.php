@@ -167,6 +167,7 @@ if ($isHome) {
             u.province,
             u.school_type
         ORDER BY u.university_name ASC
+        LIMIT 8
     ")->fetchAll();
 
     $featuredMajors = $db->query("
@@ -317,7 +318,7 @@ function render_uni_card(array $university)
             <div class="d-flex justify-content-center gap-2 mb-3">
                 <button
                     type="button"
-                    onclick="switchHomeTab('uni')"
+                    onclick="switchTab('uni')"
                     id="tab-uni"
                     class="btn fw-semibold px-4 <?= $tab === 'uni' ? 'btn-light' : 'btn-outline-light' ?>"
                     style="border-radius:30px"
@@ -328,7 +329,7 @@ function render_uni_card(array $university)
 
                 <button
                     type="button"
-                    onclick="switchHomeTab('major')"
+                    onclick="switchTab('major')"
                     id="tab-major"
                     class="btn fw-semibold px-4 <?= $tab === 'major' ? 'btn-light' : 'btn-outline-light' ?>"
                     style="border-radius:30px"

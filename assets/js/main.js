@@ -806,6 +806,7 @@ function switchTab(tab) {
 
 // Để onclick trong HTML có thể gọi được
 window.switchTab = switchTab;
+window.switchHomeTab = switchTab;
 
 // ============================================================
 // XÁC NHẬN XÓA
@@ -1132,6 +1133,9 @@ function chartBar2(
 }
 
 window.chartBar2 = chartBar2;
+// ============================================================
+// GỢI Ý TRƯỜNG Ở HERO + TỰ CUỘN SAU KHI TÌM
+// ============================================================
 document.addEventListener('DOMContentLoaded', () => {
   const input = document.getElementById('heroUniversityInput');
   const box = document.getElementById('heroUniSuggest');
@@ -1152,24 +1156,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     timer = setTimeout(async () => {
-      const res = await fetch(`api/search.php?q=${encodeURIComponent(q)}`);
-      const data = await res.json();
+      try {
+        const res = await fetch(`api/search.php?q=${encodeURIComponent(q)}`);
+        const data = await res.json();
+        const universities = data.universities || [];
 
-      const universities = data.universities || [];
+        if (universities.length === 0) {
+          box.style.display = 'none';
+          return;
+        }
 
-      if (universities.length === 0) {
+        box.innerHTML = universities.map(u => `
+          <a class="hero-suggest-item" href="university.php?id=${u.id}">
+            ${u.name}
+            <small>${u.province || ''}</small>
+          </a>
+        `).join('');
+
+        box.style.display = 'block';
+      } catch (e) {
         box.style.display = 'none';
-        return;
       }
-
-      box.innerHTML = universities.map(u => `
-        <a class="hero-suggest-item" href="university.php?id=${u.id}">
-          ${u.name}
-          <small>${u.province || ''}</small>
-        </a>
-      `).join('');
-
-      box.style.display = 'block';
     }, 250);
   });
 
@@ -1190,8 +1197,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setTimeout(() => {
       const target =
-        document.querySelector('.container.py-5') ||
-        document.querySelector('.featured-section');
+        document.querySelector('#featured-universities') ||
+        document.querySelector('.container.py-5');
 
       if (target) {
         target.scrollIntoView({

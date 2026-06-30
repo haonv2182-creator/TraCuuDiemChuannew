@@ -1,6 +1,20 @@
 <?php
 $pageTitle = 'Tra cứu nâng cao – DiemChuan.vn';
 require_once 'includes/header.php';
+<section class="sub-page-hero">
+  <div class="container text-center">
+    <span class="sub-page-label">
+      <i class="bi bi-funnel"></i>
+      Tra cứu nâng cao
+    </span>
+
+    <h1 class="sub-page-title">Tìm kiếm điểm chuẩn</h1>
+
+    <p class="sub-page-subtitle">
+      Lọc dữ liệu theo trường, ngành, năm, tổ hợp, phương thức xét tuyển và mức điểm.
+    </p>
+  </div>
+</section>
 
 $db = getDB();
 
@@ -327,7 +341,7 @@ if ($latestOnly) {
   </div>
 </div>
 
-<div class="container py-4">
+<div class="container py-4 sub-page-content">
   <div class="row g-4">
     <div class="col-lg-3">
       <div style="position:sticky;top:76px">

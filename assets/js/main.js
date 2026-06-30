@@ -1132,3 +1132,73 @@ function chartBar2(
 }
 
 window.chartBar2 = chartBar2;
+document.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById('heroUniversityInput');
+  const box = document.getElementById('heroUniSuggest');
+  const form = document.getElementById('form-uni');
+
+  if (!input || !box) return;
+
+  let timer = null;
+
+  input.addEventListener('input', () => {
+    clearTimeout(timer);
+    const q = input.value.trim();
+
+    if (q.length < 2) {
+      box.style.display = 'none';
+      box.innerHTML = '';
+      return;
+    }
+
+    timer = setTimeout(async () => {
+      const res = await fetch(`api/search.php?q=${encodeURIComponent(q)}`);
+      const data = await res.json();
+
+      const universities = data.universities || [];
+
+      if (universities.length === 0) {
+        box.style.display = 'none';
+        return;
+      }
+
+      box.innerHTML = universities.map(u => `
+        <a class="hero-suggest-item" href="university.php?id=${u.id}">
+          ${u.name}
+          <small>${u.province || ''}</small>
+        </a>
+      `).join('');
+
+      box.style.display = 'block';
+    }, 250);
+  });
+
+  document.addEventListener('click', e => {
+    if (!input.contains(e.target) && !box.contains(e.target)) {
+      box.style.display = 'none';
+    }
+  });
+
+  if (form) {
+    form.addEventListener('submit', () => {
+      sessionStorage.setItem('scrollAfterSearch', '1');
+    });
+  }
+
+  if (sessionStorage.getItem('scrollAfterSearch') === '1') {
+    sessionStorage.removeItem('scrollAfterSearch');
+
+    setTimeout(() => {
+      const target =
+        document.querySelector('.container.py-5') ||
+        document.querySelector('.featured-section');
+
+      if (target) {
+        target.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    }, 300);
+  }
+});

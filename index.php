@@ -347,14 +347,16 @@ function render_uni_card(array $university)
                 <div class="search-hero mx-auto" style="max-width:650px">
                     <i class="bi bi-building"></i>
 
-                    <input
-                        type="text"
-                        name="q"
-                        id="heroUniversityInput"
-                        value="<?= e($q) ?>"
-                        autocomplete="off"
-                        placeholder="Nhập tên trường đại học..."
-                    >
+                <input
+                    type="text"
+                    name="q"
+                    id="heroUniversityInput"
+                    value="<?= e($q) ?>"
+                    autocomplete="off"
+                    placeholder="Nhập tên trường đại học..."
+                >
+
+                <div id="heroUniSuggest" class="hero-suggest-box"></div>
 
                     <button
                         type="submit"

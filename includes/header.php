@@ -27,7 +27,6 @@ $styleVersion = file_exists($styleFile)
   <link rel="stylesheet" href="<?= url('assets/css/style.css') ?>?v=<?= $styleVersion ?>">
 
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap">
-  <link rel="stylesheet" href="<?= url('assets/css/unified.css') ?>?v=<?= time() ?>">
 </head>
 
 <body>

@@ -6,6 +6,7 @@ startSession();
 
 $_cur   = basename($_SERVER['PHP_SELF'], '.php');
 $_flash = getFlash();
+$isAdminPage = strpos($_SERVER['PHP_SELF'], '/admin/') !== false;
 
 $styleFile = __DIR__ . '/../assets/css/style.css';
 $styleVersion = file_exists($styleFile)
@@ -15,42 +16,16 @@ $styleVersion = file_exists($styleFile)
 
 <!DOCTYPE html>
 <html lang="vi" data-theme="light">
-
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1"
-  >
+  <title><?= $pageTitle ?? 'DiemChuan.vn – Tra cứu điểm chuẩn đại học' ?></title>
 
-  <title>
-    <?= $pageTitle ?? 'DiemChuan.vn – Tra cứu điểm chuẩn đại học' ?>
-  </title>
-
-  <!-- Bootstrap -->
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-  >
-
-  <!-- Bootstrap Icons -->
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
-  >
-
-  <!-- CSS chính -->
-  <link
-    rel="stylesheet"
-    href="<?= url('assets/css/style.css') ?>?v=<?= $styleVersion ?>"
-  >
-
-  <!-- Font -->
-  <link
-    rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap"
-  >
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="<?= url('assets/css/style.css') ?>?v=<?= $styleVersion ?>">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap">
 </head>
 
 <body>
@@ -61,43 +36,21 @@ $styleVersion = file_exists($styleFile)
     style="z-index:9999;min-width:320px;border-radius:12px"
     role="alert"
   >
-    <i
-      class="bi bi-<?= $_flash['type'] === 'success' ? 'check-circle' : 'exclamation-triangle' ?> me-2"
-    ></i>
-
+    <i class="bi bi-<?= $_flash['type'] === 'success' ? 'check-circle' : 'exclamation-triangle' ?> me-2"></i>
     <?= e($_flash['msg']) ?>
-
-    <button
-      type="button"
-      class="btn-close"
-      data-bs-dismiss="alert"
-      aria-label="Đóng"
-    ></button>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
   </div>
 <?php endif; ?>
 
-<!-- NAVBAR -->
+<?php if (!$isAdminPage): ?>
 <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top shadow-sm">
   <div class="container">
-
-    <!-- Logo -->
-    <a
-      class="navbar-brand d-flex align-items-center gap-2 fw-bold text-primary"
-      href="<?= url('index.php') ?>"
-    >
+    <a class="navbar-brand d-flex align-items-center gap-2 fw-bold text-primary" href="<?= url('index.php') ?>">
       <span class="brand-icon">🎓</span>
-
       <span>DiemChuan</span>
-
-      <span
-        class="badge bg-primary ms-1"
-        style="font-size:.58rem;vertical-align:middle"
-      >
-        VN
-      </span>
+      <span class="badge bg-primary ms-1" style="font-size:.58rem;vertical-align:middle">VN</span>
     </a>
 
-    <!-- Nút menu điện thoại -->
     <button
       class="navbar-toggler border-0"
       type="button"
@@ -111,8 +64,6 @@ $styleVersion = file_exists($styleFile)
     </button>
 
     <div class="collapse navbar-collapse" id="navMain">
-
-      <!-- Menu -->
       <ul class="navbar-nav me-auto gap-1 mb-2 mb-lg-0">
         <?php
         $menuItems = [
@@ -125,22 +76,15 @@ $styleVersion = file_exists($styleFile)
 
         <?php foreach ($menuItems as [$page, $icon, $label]): ?>
           <li class="nav-item">
-            <a
-              class="nav-link <?= $_cur === $page ? 'active' : '' ?>"
-              href="<?= url($page . '.php') ?>"
-            >
+            <a class="nav-link <?= $_cur === $page ? 'active' : '' ?>" href="<?= url($page . '.php') ?>">
               <i class="bi <?= $icon ?> me-1"></i>
-
               <?= e($label) ?>
             </a>
           </li>
         <?php endforeach; ?>
       </ul>
 
-      <!-- Khu vực nút bên phải -->
       <div class="d-flex align-items-center gap-2">
-
-        <!-- Dark mode -->
         <button
           id="darkBtn"
           class="btn btn-sm btn-light border"
@@ -152,40 +96,23 @@ $styleVersion = file_exists($styleFile)
         </button>
 
         <?php if (isAdmin()): ?>
-
-          <!-- Trang quản trị -->
-          <a
-            href="<?= url('admin/dashboard.php') ?>"
-            class="btn btn-sm btn-outline-primary"
-          >
+          <a href="<?= url('admin/dashboard.php') ?>" class="btn btn-sm btn-outline-primary">
             <i class="bi bi-speedometer2 me-1"></i>
             Admin
           </a>
 
-          <!-- Đăng xuất -->
-          <a
-            href="<?= url('logout.php') ?>"
-            class="btn btn-sm btn-outline-danger"
-          >
+          <a href="<?= url('logout.php') ?>" class="btn btn-sm btn-outline-danger">
             <i class="bi bi-box-arrow-right me-1"></i>
             Đăng xuất
           </a>
-
         <?php else: ?>
-
-          <!-- Đăng nhập -->
-          <a
-            href="<?= url('login.php') ?>"
-            class="btn btn-sm btn-primary px-3"
-          >
+          <a href="<?= url('login.php') ?>" class="btn btn-sm btn-primary px-3">
             <i class="bi bi-person-circle me-1"></i>
             Đăng nhập
           </a>
-
         <?php endif; ?>
-
       </div>
     </div>
   </div>
 </nav>
-
+<?php endif; ?>

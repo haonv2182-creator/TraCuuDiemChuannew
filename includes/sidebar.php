@@ -37,15 +37,6 @@ $_ap = basename($_SERVER['PHP_SELF'], '.php');
         <div class="sb-label">
             QUẢN LÝ
         </div>
-
-        <a
-            href="<?= url('admin/manage_scores.php') ?>"
-            class="sb-link <?= $_ap === 'manage_scores' ? 'active' : '' ?>"
-        >
-            <i class="bi bi-database"></i>
-            Dữ liệu tuyển sinh
-        </a>
-
         <a
             href="<?= url('admin/import_csv.php') ?>"
             class="sb-link <?= $_ap === 'import_csv' ? 'active' : '' ?>"

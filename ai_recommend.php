@@ -1,33 +1,8 @@
-
 <?php
 $pageTitle = 'Gợi ý theo điểm – DiemChuan.vn';
 require_once 'includes/header.php';
 
 $db = getDB();
-
-function recommend_method_label(string $method): string
-{
-    $labels = [
-        'THPT'    => 'Thi THPT',
-        'HocBa'   => 'Học bạ',
-        'TongHop' => 'Tổng hợp',
-        'DGNL'    => 'Đánh giá năng lực'
-    ];
-
-    return $labels[$method] ?? $method;
-}
-
-function recommend_method_color(string $method): string
-{
-    $colors = [
-        'THPT'    => 'primary',
-        'HocBa'   => 'success',
-        'TongHop' => 'warning',
-        'DGNL'    => 'info'
-    ];
-
-    return $colors[$method] ?? 'secondary';
-}
 
 function recommend_major_name(array $majors, int $majorId): string
 {
@@ -274,7 +249,7 @@ $majorName = recommend_major_name($majors, $majorId);
                                             value="<?= e($methodValue) ?>"
                                             <?= $method === $methodValue ? 'selected' : '' ?>
                                         >
-                                            <?= e(recommend_method_label($methodValue)) ?>
+                                            <?= e(methodLabel($methodValue)) ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
@@ -414,7 +389,7 @@ $majorName = recommend_major_name($majors, $majorId);
                                 </span>
 
                                 <?php if ($method): ?>
-                                    · <?= e(recommend_method_label($method)) ?>
+                                    · <?= e(methodLabel($method)) ?>
                                 <?php endif; ?>
 
                                 <?php if ($combination): ?>
@@ -506,8 +481,8 @@ $majorName = recommend_major_name($majors, $majorId);
                                                             </td>
 
                                                             <td>
-                                                                <span class="badge text-bg-<?= e(recommend_method_color($row['method'])) ?> fw-normal">
-                                                                    <?= e(recommend_method_label($row['method'])) ?>
+                                                                <span class="badge text-bg-<?= e(methodColor($row['method'])) ?> fw-normal">
+                                                                    <?= e(methodLabel($row['method'])) ?>
                                                                 </span>
                                                             </td>
 

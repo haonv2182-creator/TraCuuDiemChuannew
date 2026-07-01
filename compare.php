@@ -11,21 +11,6 @@ $method           = trim((string)($_GET['method'] ?? ''));
 $compareRequested = isset($_GET['compare']);
 
 /**
- * Đổi mã phương thức thành tên dễ đọc.
- */
-function compare_method_label(string $method): string
-{
-    $labels = [
-        'THPT'    => 'Thi THPT',
-        'HocBa'   => 'Học bạ',
-        'TongHop' => 'Tổng hợp',
-        'DGNL'    => 'Đánh giá năng lực',
-    ];
-
-    return $labels[$method] ?? $method;
-}
-
-/**
  * Rút gọn tên trường để hiển thị trên bảng và biểu đồ.
  */
 function compare_short_name(string $name, int $length = 18): string
@@ -457,7 +442,7 @@ $latestDifference = (
                                 value="<?= e($methodValue) ?>"
                                 <?= $method === $methodValue ? 'selected' : '' ?>
                             >
-                                <?= e(compare_method_label($methodValue)) ?>
+                                <?= e(methodLabel($methodValue)) ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -520,7 +505,7 @@ $latestDifference = (
 
                 <span class="chip">
                     <i class="bi bi-check2-circle me-1"></i>
-                    <?= e(compare_method_label($method)) ?>
+                    <?= e(methodLabel($method)) ?>
                 </span>
 
                 <span class="small text-muted">
@@ -779,7 +764,7 @@ $latestDifference = (
 
                             <tr>
                                 <td class="text-muted">Phương thức</td>
-                                <td><?= e(compare_method_label($method)) ?></td>
+                                <td><?= e(methodLabel($method)) ?></td>
                             </tr>
 
                             <?php if (!empty($schoolData)): ?>

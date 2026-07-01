@@ -148,27 +148,29 @@ $featuredMajors = [];
 if ($isHome) {
     $featuredFilter = $showAll ? '' : 'WHERE u.is_featured = 1';
 
-    $featuredUnis = $db->query("
-        SELECT
-            u.university_id,
-            u.university_name,
-            u.university_code,
-            u.province,
-            u.school_type,
-            COUNT(DISTINCT s.major_id) AS mcnt
-        FROM universities u
-        LEFT JOIN admission_scores s
-            ON u.university_id = s.university_id
-        $featuredFilter
-        GROUP BY
-            u.university_id,
-            u.university_name,
-            u.university_code,
-            u.province,
-            u.school_type
-        ORDER BY u.university_name ASC
-        LIMIT 8
-    ")->fetchAll();
+$featuredLimit = $showAll ? '' : 'LIMIT 8';
+
+        $featuredUnis = $db->query("
+            SELECT
+                u.university_id,
+                u.university_name,
+                u.university_code,
+                u.province,
+                u.school_type,
+                COUNT(DISTINCT s.major_id) AS mcnt
+            FROM universities u
+            LEFT JOIN admission_scores s
+                ON u.university_id = s.university_id
+            $featuredFilter
+            GROUP BY
+                u.university_id,
+                u.university_name,
+                u.university_code,
+                u.province,
+                u.school_type
+            ORDER BY u.university_name ASC
+            $featuredLimit
+        ")->fetchAll();
 
     $featuredMajors = $db->query("
         SELECT
@@ -214,7 +216,7 @@ $actionItems = [
         'url'         => 'search.php',
         'icon_class'  => 'action-search',
         'icon'        => 'bi-search',
-        'title'       => 'Tra cứu điểm chuẩn',
+        'title'       => 'Tra cứu nâng cao',
         'description' => 'Tìm điểm theo trường, ngành, tổ hợp, năm và phương thức xét tuyển.',
         'link_text'   => 'Tra cứu ngay'
     ],

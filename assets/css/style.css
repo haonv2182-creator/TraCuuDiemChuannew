@@ -4361,3 +4361,239 @@ footer {
     padding-top: 128px !important;
     min-height: 330px !important;
 }
+.search-page-hero,
+.compare-page-hero,
+.ai-page-hero {
+  width: 100vw !important;
+  margin-left: calc(50% - 50vw) !important;
+  margin-right: calc(50% - 50vw) !important;
+  margin-top: -78px !important;
+  padding-top: 128px !important;
+  padding-bottom: 96px !important;
+  min-height: 340px !important;
+}
+
+.search-page-hero .container,
+.compare-page-hero .container,
+.ai-page-hero .container {
+  min-height: 210px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.search-hero-content,
+.compare-hero-content,
+.ai-hero-content {
+  max-width: 820px !important;
+  margin: 0 auto !important;
+  text-align: center !important;
+}
+
+.search-page-hero .sub-page-title,
+.compare-page-hero .sub-page-title,
+.ai-page-hero .sub-page-title {
+  margin: 0 0 10px !important;
+  color: #fff !important;
+  font-size: 38px !important;
+  font-weight: 800 !important;
+  line-height: 1.15 !important;
+}
+
+.search-page-hero .sub-page-subtitle,
+.compare-page-hero .sub-page-subtitle,
+.ai-page-hero .sub-page-subtitle {
+  max-width: 700px !important;
+  margin: 0 auto !important;
+  color: rgba(255,255,255,.92) !important;
+  font-size: 15px !important;
+}
+
+.sub-page-content {
+  margin-top: -118px !important;
+  position: relative !important;
+  z-index: 5 !important;
+}
+.ai-page .card.shadow-sm.mb-4 {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px !important;
+  border: 1px solid #e5edff !important;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(37, 99, 235, .10), transparent 28%),
+    radial-gradient(circle at 100% 0%, rgba(236, 72, 153, .10), transparent 26%),
+    #ffffff !important;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, .10) !important;
+}
+
+.ai-page .card.shadow-sm.mb-4::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 6px;
+  background: linear-gradient(90deg, #2563eb, #7c3aed, #ec4899);
+}
+
+.ai-page .card.shadow-sm.mb-4 .card-body {
+  padding: 34px !important;
+}
+
+.ai-page .form-label {
+  color: #475569;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+}
+
+.ai-page .form-control,
+.ai-page .form-select {
+  min-height: 54px !important;
+  border-radius: 16px !important;
+}
+
+.ai-page .btn-primary {
+  min-height: 54px;
+  border-radius: 16px !important;
+}
+/* FORM GỢI Ý THEO ĐIỂM GIỐNG FORM SO SÁNH */
+.ai-page > .row > .col-xl-10 > .card.shadow-sm.mb-4 {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #e5edff !important;
+  border-radius: 28px !important;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(37, 99, 235, .10), transparent 28%),
+    radial-gradient(circle at 100% 0%, rgba(124, 58, 237, .10), transparent 26%),
+    #ffffff !important;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, .10) !important;
+}
+
+.ai-page > .row > .col-xl-10 > .card.shadow-sm.mb-4::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 6px;
+  background: linear-gradient(90deg, #2563eb, #7c3aed, #ec4899);
+}
+
+.ai-page > .row > .col-xl-10 > .card.shadow-sm.mb-4 .card-body {
+  padding: 34px !important;
+}
+
+.ai-page .form-label {
+  color: #475569 !important;
+  font-size: 12px !important;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+}
+
+.ai-page .form-control,
+.ai-page .form-select {
+  min-height: 54px !important;
+  padding: 12px 16px !important;
+  color: #172033 !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  border: 1px solid #dbeafe !important;
+  border-radius: 16px !important;
+  background-color: #fff !important;
+}
+
+.ai-page .btn-primary {
+  min-height: 54px !important;
+  border-radius: 16px !important;
+  font-weight: 800 !important;
+  background: linear-gradient(135deg, #2563eb, #7c3aed) !important;
+}
+/* AI form giống compare trong dark mode */
+[data-theme="dark"] .ai-page > .row > .col-xl-10 > .card.shadow-sm.mb-4 {
+  background: #111827 !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .ai-page > .row > .col-xl-10 > .card.shadow-sm.mb-4 .card-body {
+  background: transparent !important;
+}
+
+[data-theme="dark"] .ai-page .form-control,
+[data-theme="dark"] .ai-page .form-select {
+  color: #e2e8f0 !important;
+  background: #172033 !important;
+  border-color: #475569 !important;
+}
+
+[data-theme="dark"] .ai-page .form-label,
+[data-theme="dark"] .ai-page small {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .ai-page .btn-primary {
+  color: #fff !important;
+  background: linear-gradient(135deg, #2563eb, #7c3aed) !important;
+}
+.compare-page > .row > .col-xl-10 {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.compare-page > .row > .col-xl-10 > .compare-control-card {
+  margin-top: 0 !important;
+}
+.ai-page.sub-page-content {
+  margin-top: -115px !important;
+  position: relative !important;
+  z-index: 5 !important;
+}
+.ai-page.sub-page-content {
+  margin-top: -150px !important;
+}
+[data-theme="dark"] .ai-page.sub-page-content {
+  margin-top: -150px !important;
+  padding-top: 70px !important;
+  background: transparent !important;
+}
+
+[data-theme="dark"] .ai-page > .row > .col-xl-10 {
+  background: transparent !important;
+}
+
+[data-theme="dark"] .ai-page > .row > .col-xl-10 > .card.shadow-sm.mb-4 {
+  margin-top: 0 !important;
+  background: #111827 !important;
+}
+/* FIX DARK MODE TRANG SO SÁNH */
+[data-theme="dark"] .compare-page.sub-page-content {
+  margin-top: -115px !important;
+  background: transparent !important;
+}
+
+[data-theme="dark"] .compare-control-card {
+  background:
+    radial-gradient(circle at 0% 0%, rgba(37, 99, 235, .10), transparent 28%),
+    radial-gradient(circle at 100% 0%, rgba(124, 58, 237, .10), transparent 26%),
+    #111827 !important;
+  border: 1px solid #334155 !important;
+  border-radius: 28px !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .28) !important;
+}
+
+[data-theme="dark"] .compare-control-card .card-body {
+  background: transparent !important;
+}
+
+[data-theme="dark"] .compare-control-card .form-select,
+[data-theme="dark"] .compare-control-card .form-control {
+  color: #e2e8f0 !important;
+  background: #172033 !important;
+  border-color: #475569 !important;
+}
+
+[data-theme="dark"] .compare-control-card .form-label {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .compare-control-card .small.text-muted {
+  color: #cbd5e1 !important;
+  background: rgba(15, 23, 42, .65) !important;
+}

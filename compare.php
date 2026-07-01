@@ -339,10 +339,7 @@ $latestDifference = (
             <div class="card shadow-sm mb-4 compare-control-card">
                 <div class="card-body p-4">
                     <form method="GET" id="compareForm">
-    <!-- Form chọn dữ liệu -->
-    <div class="card shadow-sm mb-4 compare-control-card">
-        <div class="card-body p-4">
-        <form method="GET" id="compareForm">
+    
 
             <div class="row g-3">
                 <!-- Trường A -->
@@ -485,7 +482,6 @@ $latestDifference = (
             <div class="mt-3 small text-muted">
                 <i class="bi bi-info-circle me-1"></i>
                 Danh sách ngành và phương thức chỉ hiển thị những lựa chọn có dữ liệu ở cả hai trường.
-                Hệ thống không bắt buộc hai trường phải có cùng tổ hợp xét tuyển.
             </div>
         </form>
         </div>

@@ -245,63 +245,6 @@ $actionItems = [
     ]
 ];
 
-function uni_code_box($code, $name, $length = 4)
-{
-    $code = trim((string)$code);
-
-    return $code !== ''
-        ? $code
-        : mb_substr(trim((string)$name), 0, $length, 'UTF-8');
-}
-
-function render_uni_card(array $university)
-{
-    ?>
-    <div class="col-6 col-md-4 col-lg-3">
-        <a
-            href="<?= url('university.php?id=' . $university['university_id']) ?>"
-            class="uni-card h-100 text-decoration-none"
-        >
-            <div class="d-flex align-items-center gap-3 mb-3">
-                <div
-                    class="uni-logo flex-shrink-0 d-flex align-items-center justify-content-center"
-                    style="width:48px;height:48px;font-size:12px;font-weight:700"
-                >
-                    <?= e(uni_code_box(
-                        $university['university_code'] ?? '',
-                        $university['university_name'] ?? '',
-                        4
-                    )) ?>
-                </div>
-
-                <div class="overflow-hidden">
-                    <div
-                        class="fw-bold text-dark"
-                        style="font-size:13px;line-height:1.3"
-                    >
-                        <?= e($university['university_name']) ?>
-                    </div>
-
-                    <div class="text-muted" style="font-size:11px">
-                        <i class="bi bi-geo-alt me-1"></i>
-                        <?= e($university['province']) ?>
-                    </div>
-                </div>
-            </div>
-
-            <div class="d-flex gap-2 flex-wrap">
-                <span class="chip">
-                    <?= (int)$university['mcnt'] ?> ngành
-                </span>
-
-                <span class="chip">
-                    <?= e($university['school_type']) ?>
-                </span>
-            </div>
-        </a>
-    </div>
-    <?php
-}
 ?>
 
 <section class="hero home-hero">
@@ -843,37 +786,5 @@ function render_uni_card(array $university)
 
 </div>
 
-<script>
-function switchHomeTab(tab) {
-    const isUniversityTab = tab === 'uni';
-
-    const formUni = document.getElementById('form-uni');
-    const formMajor = document.getElementById('form-major');
-    const tabUni = document.getElementById('tab-uni');
-    const tabMajor = document.getElementById('tab-major');
-    const featuredUniversities = document.getElementById('featured-universities');
-    const featuredMajors = document.getElementById('featured-majors');
-
-    formUni?.classList.toggle('d-none', !isUniversityTab);
-    formMajor?.classList.toggle('d-none', isUniversityTab);
-
-    tabUni?.classList.toggle('btn-light', isUniversityTab);
-    tabUni?.classList.toggle('btn-outline-light', !isUniversityTab);
-    tabMajor?.classList.toggle('btn-light', !isUniversityTab);
-    tabMajor?.classList.toggle('btn-outline-light', isUniversityTab);
-
-    featuredUniversities?.classList.toggle('d-none', !isUniversityTab);
-    featuredMajors?.classList.toggle('d-none', isUniversityTab);
-}
-
-// Giữ lại tên cũ để tránh lỗi nếu file JS khác còn gọi switchTab().
-function switchTab(tab) {
-    switchHomeTab(tab);
-}
-
-<?php if ($mid > 0): ?>
-switchHomeTab('major');
-<?php endif; ?>
-</script>
 
 <?php require_once 'includes/footer.php'; ?>

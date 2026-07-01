@@ -98,3 +98,66 @@ function methodColor(string $method): string
     $methods = getAdmissionMethods();
     return $methods[$method]['color'] ?? 'secondary';
 }
+
+// Home page helpers
+if (!function_exists('uni_code_box')) {
+    function uni_code_box($code, $name, $length = 4)
+    {
+        $code = trim((string)$code);
+
+        return $code !== ''
+            ? $code
+            : mb_substr(trim((string)$name), 0, $length, 'UTF-8');
+    }
+}
+
+if (!function_exists('render_uni_card')) {
+    function render_uni_card(array $university): void
+    {
+        ?>
+        <div class="col-6 col-md-4 col-lg-3">
+            <a
+                href="<?= url('university.php?id=' . $university['university_id']) ?>"
+                class="uni-card h-100 text-decoration-none"
+            >
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div
+                        class="uni-logo flex-shrink-0 d-flex align-items-center justify-content-center"
+                        style="width:48px;height:48px;font-size:12px;font-weight:700"
+                    >
+                        <?= e(uni_code_box(
+                            $university['university_code'] ?? '',
+                            $university['university_name'] ?? '',
+                            4
+                        )) ?>
+                    </div>
+
+                    <div class="overflow-hidden">
+                        <div
+                            class="fw-bold text-dark"
+                            style="font-size:13px;line-height:1.3"
+                        >
+                            <?= e($university['university_name']) ?>
+                        </div>
+
+                        <div class="text-muted" style="font-size:11px">
+                            <i class="bi bi-geo-alt me-1"></i>
+                            <?= e($university['province']) ?>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap">
+                    <span class="chip">
+                        <?= (int)$university['mcnt'] ?> ngÃ nh
+                    </span>
+
+                    <span class="chip">
+                        <?= e($university['school_type']) ?>
+                    </span>
+                </div>
+            </a>
+        </div>
+        <?php
+    }
+}

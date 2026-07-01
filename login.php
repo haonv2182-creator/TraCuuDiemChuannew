@@ -19,7 +19,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($user !== '' && $pass !== '') {
         $db = getDB();
 
-        $stmt = $db->prepare("SELECT * FROM users WHERE username = ? LIMIT 1");
+        $stmt = $db->prepare("
+            SELECT user_id, username, password, role
+            FROM users
+            WHERE username = ?
+            LIMIT 1
+        ");
         $stmt->execute([$user]);
         $row = $stmt->fetch();
 

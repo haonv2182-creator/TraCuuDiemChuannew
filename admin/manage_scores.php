@@ -14,12 +14,7 @@ $yearFilter   = (int)($_GET['year'] ?? 0);
 $methodFilter = trim((string)($_GET['method'] ?? ''));
 $page         = max(1, (int)($_GET['page'] ?? 1));
 
-$methods = [
-    'THPT'    => 'Thi THPT',
-    'HocBa'   => 'Học bạ',
-    'TongHop' => 'Tổng hợp',
-    'DGNL'    => 'Đánh giá năng lực'
-];
+$methods = getAdmissionMethods();
 
 $combinations = [
     '',
@@ -35,10 +30,6 @@ $combinations = [
 
 $years = range((int)date('Y'), 2015);
 
-function admin_method_label(string $method, array $methods): string
-{
-    return $methods[$method] ?? $method;
-}
 
 /* Danh sách trường */
 $universities = $db->query("
@@ -737,7 +728,7 @@ if ($universityId > 0) {
                                     required
                                 >
 
-                                    <?php foreach ($methods as $value => $label): ?>
+                                    <?php foreach ($methods as $value => $methodItem): ?>
 
                                         <option
                                             value="<?= e($value) ?>"
@@ -746,7 +737,7 @@ if ($universityId > 0) {
                                                 ? 'selected'
                                                 : '' ?>
                                         >
-                                            <?= e($label) ?>
+                                            <?= e(methodLabel($value)) ?>
                                         </option>
 
                                     <?php endforeach; ?>
@@ -874,7 +865,7 @@ if ($universityId > 0) {
                                 Tất cả phương thức
                             </option>
 
-                            <?php foreach ($methods as $value => $label): ?>
+                            <?php foreach ($methods as $value => $methodItem): ?>
 
                                 <option
                                     value="<?= e($value) ?>"
@@ -882,7 +873,7 @@ if ($universityId > 0) {
                                         ? 'selected'
                                         : '' ?>
                                 >
-                                    <?= e($label) ?>
+                                    <?= e(methodLabel($value)) ?>
                                 </option>
 
                             <?php endforeach; ?>
@@ -1019,12 +1010,7 @@ if ($universityId > 0) {
 
                                         <td>
                                             <span class="chip">
-                                                <?= e(
-                                                    admin_method_label(
-                                                        (string)$row['method'],
-                                                        $methods
-                                                    )
-                                                ) ?>
+                                                <?= e(methodLabel((string)$row['method'])) ?>
                                             </span>
                                         </td>
 

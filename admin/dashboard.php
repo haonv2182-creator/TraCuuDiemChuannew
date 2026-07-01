@@ -15,12 +15,7 @@ $yearFilter   = (int)($_GET['year'] ?? 0);
 $methodFilter = trim((string)($_GET['method'] ?? ''));
 $page         = max(1, (int)($_GET['page'] ?? 1));
 
-$methods = [
-    'THPT'    => 'Thi THPT',
-    'HocBa'   => 'Học bạ',
-    'TongHop' => 'Tổng hợp',
-    'DGNL'    => 'Đánh giá năng lực'
-];
+$methods = getAdmissionMethods();
 
 $combinations = [
     '',
@@ -36,10 +31,6 @@ $combinations = [
 
 $years = range((int)date('Y'), 2015);
 
-function admin_method_label(string $method, array $methods): string
-{
-    return $methods[$method] ?? $method;
-}
 
 $universities = $db->query("
     SELECT university_id, university_name, university_code, province, school_type
@@ -399,9 +390,9 @@ if ($universityId > 0) {
                             <div class="col-md-3">
                                 <label class="form-label fw-semibold small">Phương thức <span class="text-danger">*</span></label>
                                 <select name="method" id="scoreMethod" class="form-select" required>
-                                    <?php foreach ($methods as $value => $label): ?>
+                                    <?php foreach ($methods as $value => $methodItem): ?>
                                         <option value="<?= e($value) ?>" <?= (string)($editRow['method'] ?? 'THPT') === $value ? 'selected' : '' ?>>
-                                            <?= e($label) ?>
+                                            <?= e(methodLabel($value)) ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
@@ -453,8 +444,8 @@ if ($universityId > 0) {
                         <label class="form-label fw-semibold small">Lọc theo phương thức</label>
                         <select name="method" class="form-select form-select-sm">
                             <option value="">Tất cả phương thức</option>
-                            <?php foreach ($methods as $value => $label): ?>
-                                <option value="<?= e($value) ?>" <?= $methodFilter === $value ? 'selected' : '' ?>><?= e($label) ?></option>
+                            <?php foreach ($methods as $value => $methodItem): ?>
+                                <option value="<?= e($value) ?>" <?= $methodFilter === $value ? 'selected' : '' ?>><?= e(methodLabel($value)) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -515,7 +506,7 @@ if ($universityId > 0) {
                                         <td class="fw-semibold"><?= e($row['major_name']) ?></td>
                                         <td><span class="chip"><?= e($row['year']) ?></span></td>
                                         <td><span class="chip"><?= !empty($row['combination']) ? e($row['combination']) : '—' ?></span></td>
-                                        <td><span class="chip"><?= e(admin_method_label((string)$row['method'], $methods)) ?></span></td>
+                                        <td><span class="chip"><?= e(methodLabel((string)$row['method'])) ?></span></td>
                                         <td><span class="score-badge <?= $scoreClass ?>"><?= number_format((float)$row['score'], 2) ?></span></td>
                                         <td>
                                             <div class="d-flex gap-1">

@@ -12,7 +12,8 @@ $errors = [];
 $success = 0;
 $done = false;
 
-$validMethods = ['THPT', 'HocBa', 'TongHop', 'DGNL'];
+$validMethods = array_keys(getAdmissionMethods());
+$methodGuide = implode(', ', $validMethods);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
     $f = $_FILES['csv_file'];
@@ -265,7 +266,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
                             <li><b>year</b>: từ 2015 đến <?= date('Y') ?></li>
                             <li><b>combination</b>: dạng A00, A01, B00...</li>
                             <li><b>DGNL</b>: để trống tổ hợp</li>
-                            <li><b>method</b>: THPT, HocBa, TongHop, DGNL</li>
+                            <li><b>method</b>: <?= e($methodGuide) ?></li>
                             <li><b>score</b>: THPT/Học bạ/Tổng hợp từ 0 đến 30, DGNL từ 1 đến 1200</li>
                             <li>Trường/ngành chưa có → <b>tự động tạo</b></li>
                             <li>Không dùng cột <b>chỉ tiêu</b></li>
@@ -374,4 +375,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
 </div>
 
 <?php require_once '../includes/footer.php'; ?>
-

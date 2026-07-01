@@ -63,3 +63,38 @@ function getProvinces():array{
     return ['TP. Hồ Chí Minh','Hà Nội','Đà Nẵng','Cần Thơ','Hải Phòng',
             'Bình Dương','Đồng Nai','Khánh Hòa','Thừa Thiên Huế','Nghệ An'];
 }
+
+// ── Phương thức xét tuyển dùng chung ──
+function getAdmissionMethods(): array
+{
+    return [
+        'THPT' => [
+            'label' => 'Thi THPT',
+            'color' => 'primary'
+        ],
+        'HocBa' => [
+            'label' => 'Học bạ',
+            'color' => 'success'
+        ],
+        'TongHop' => [
+            'label' => 'Tổng hợp',
+            'color' => 'warning'
+        ],
+        'DGNL' => [
+            'label' => 'Đánh giá năng lực',
+            'color' => 'info'
+        ]
+    ];
+}
+
+function methodLabel(string $method): string
+{
+    $methods = getAdmissionMethods();
+    return $methods[$method]['label'] ?? $method;
+}
+
+function methodColor(string $method): string
+{
+    $methods = getAdmissionMethods();
+    return $methods[$method]['color'] ?? 'secondary';
+}

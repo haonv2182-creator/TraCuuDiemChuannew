@@ -122,13 +122,8 @@ $combinations = $db->query("
     ORDER BY combination
 ")->fetchAll(PDO::FETCH_COLUMN);
 
-$methods = $db->query("
-    SELECT DISTINCT method
-    FROM admission_scores
-    WHERE method IS NOT NULL
-      AND TRIM(method) <> ''
-    ORDER BY method
-")->fetchAll(PDO::FETCH_COLUMN);
+$validMethods = array_keys(getAdmissionMethods());
+$methods = $validMethods;
 
 $majors = $db->query("
     SELECT major_id, major_name
@@ -152,6 +147,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $combination = trim((string)($_POST['combination'] ?? ''));
     $province    = trim((string)($_POST['province'] ?? ''));
     $majorId     = (int)($_POST['major_id'] ?? 0);
+
+    if ($method !== '' && !in_array($method, $validMethods, true)) {
+        $method = '';
+    }
 
     if ($method === '') {
         $error = 'Vui lòng chọn phương thức xét tuyển.';

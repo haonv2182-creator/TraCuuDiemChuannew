@@ -441,21 +441,13 @@ function render_uni_card(array $university)
                 </div>
             <?php endif; ?>
 
-            <div class="home-hero-stats">
-                <?php foreach ($statItems as $item): ?>
-                    <div class="home-hero-stat">
-                        <div class="home-stat-icon">
-                            <i class="bi <?= e($item['icon']) ?>"></i>
-                        </div>
-
-                        <div>
-                            <strong data-counter="<?= $item['value'] ?>">
-                                <?= number_format($item['value']) ?>
-                            </strong>
-                            <span><?= e($item['label']) ?></span>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
+            <div class="hero-stats d-flex flex-wrap gap-3 mt-4 justify-content-center">
+            <?php foreach ($statItems as $item): ?>
+                <div class="hero-stat-card">
+                <strong><?= number_format($item['value']) ?>+</strong>
+                <span><?= e($item['label']) ?></span>
+                </div>
+            <?php endforeach; ?>
             </div>
 
         </div>

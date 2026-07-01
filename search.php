@@ -1,20 +1,6 @@
 <?php
 $pageTitle = 'Tra cứu nâng cao – DiemChuan.vn';
 require_once 'includes/header.php';
-<section class="sub-page-hero">
-  <div class="container text-center">
-    <span class="sub-page-label">
-      <i class="bi bi-funnel"></i>
-      Tra cứu nâng cao
-    </span>
-
-    <h1 class="sub-page-title">Tìm kiếm điểm chuẩn</h1>
-
-    <p class="sub-page-subtitle">
-      Lọc dữ liệu theo trường, ngành, năm, tổ hợp, phương thức xét tuyển và mức điểm.
-    </p>
-  </div>
-</section>
 
 $db = getDB();
 
@@ -319,27 +305,23 @@ if ($latestOnly) {
 }
 ?>
 
-<!-- TIÊU ĐỀ TRANG -->
-<div
-  style="background:var(--gray-50);border-bottom:1px solid var(--gray-200);padding:18px 0"
->
+
+<section class="sub-page-hero search-page-hero">
   <div class="container">
-    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+    <div class="search-hero-content">
+      <span class="sub-page-label">
+        <i class="bi bi-funnel"></i>
+        Tra cứu nâng cao
+      </span>
 
-      <div>
-        <h4 class="fw-bold mb-1">
-          <i class="bi bi-funnel me-2 text-primary"></i>
-          Tra cứu nâng cao
-        </h4>
+      <h1 class="sub-page-title">Tra cứu nâng cao</h1>
 
-        <p class="text-muted small mb-0">
-          Lọc điểm chuẩn theo trường, ngành, năm và phương thức xét tuyển
-        </p>
-      </div>
-
+      <p class="sub-page-subtitle">
+        Lọc điểm chuẩn theo trường, ngành, năm và phương thức xét tuyển phù hợp với bạn
+      </p>
     </div>
   </div>
-</div>
+</section>
 
 <div class="container py-4 sub-page-content">
   <div class="row g-4">

@@ -67,8 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <label class="form-label fw-semibold">Tên đăng nhập</label>
           <div class="input-group">
             <span class="input-group-text"><i class="bi bi-person"></i></span>
-            <input type="text" name="username" class="form-control form-control-lg"
-                   value="admin" required autofocus>
+            <input type="text" name="username" class="form-control form-control-lg" required autofocus>
           </div>
         </div>
 

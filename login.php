@@ -11,6 +11,8 @@ if (isAdmin()) {
 }
 
 $err = '';
+$styleFile = __DIR__ . '/assets/css/style.css';
+$styleVersion = file_exists($styleFile) ? filemtime($styleFile) : time();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user = trim($_POST['username'] ?? '');
@@ -49,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <title>Đăng nhập – DiemChuan.vn</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link rel="stylesheet" href="<?= url('assets/css/style.css') ?>">
+  <link rel="stylesheet" href="<?= url('assets/css/style.css') ?>?v=<?= $styleVersion ?>">
 </head>
 <body class="bg-light">
 <div class="min-vh-100 d-flex align-items-center justify-content-center p-3">
@@ -63,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <?php if ($err): ?>
       <div class="alert alert-danger">
-        <i class="bi bi-exclamation-triangle me-1"></i><?= htmlspecialchars($err) ?>
+        <i class="bi bi-exclamation-triangle me-1"></i><?= e($err) ?>
       </div>
       <?php endif; ?>
 
@@ -72,7 +74,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <label class="form-label fw-semibold">Tên đăng nhập</label>
           <div class="input-group">
             <span class="input-group-text"><i class="bi bi-person"></i></span>
-            <input type="text" name="username" class="form-control form-control-lg" required autofocus>
+            <input
+              type="text"
+              name="username"
+              class="form-control form-control-lg"
+              autocomplete="username"
+              required
+              autofocus
+            >
           </div>
         </div>
 
@@ -80,8 +89,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <label class="form-label fw-semibold">Mật khẩu</label>
           <div class="input-group">
             <span class="input-group-text"><i class="bi bi-lock"></i></span>
-            <input type="password" name="password" id="passInput"
-                   class="form-control form-control-lg" placeholder="••••••••" required>
+            <input
+              type="password"
+              name="password"
+              id="passInput"
+              class="form-control form-control-lg"
+              placeholder="••••••••"
+              autocomplete="current-password"
+              required
+            >
             <button type="button" class="btn btn-outline-secondary"
               onclick="var p=document.getElementById('passInput');p.type=p.type==='password'?'text':'password'">
               <i class="bi bi-eye"></i>

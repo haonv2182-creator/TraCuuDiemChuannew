@@ -8,6 +8,8 @@ if (!$id) {
 }
 
 $db = getDB();
+$validMethods = array_keys(getAdmissionMethods());
+$methodPlaceholders = implode(',', array_fill(0, count($validMethods), '?'));
 
 $universityStmt = $db->prepare("
     SELECT *
@@ -34,31 +36,24 @@ $yearsStmt = $db->prepare("
     SELECT DISTINCT year
     FROM admission_scores
     WHERE university_id = ?
+      AND method IN ($methodPlaceholders)
     ORDER BY year DESC
 ");
-$yearsStmt->execute([$id]);
+$yearsStmt->execute(array_merge([$id], $validMethods));
 $years = $yearsStmt->fetchAll(PDO::FETCH_COLUMN);
 
-$methodsStmt = $db->prepare("
-    SELECT DISTINCT method
-    FROM admission_scores
-    WHERE university_id = ?
-      AND method IS NOT NULL
-      AND TRIM(method) <> ''
-    ORDER BY method
-");
-$methodsStmt->execute([$id]);
-$methods = $methodsStmt->fetchAll(PDO::FETCH_COLUMN);
+$methods = $validMethods;
 
 $combinationsStmt = $db->prepare("
     SELECT DISTINCT combination
     FROM admission_scores
     WHERE university_id = ?
+      AND method IN ($methodPlaceholders)
       AND combination IS NOT NULL
       AND TRIM(combination) <> ''
     ORDER BY combination
 ");
-$combinationsStmt->execute([$id]);
+$combinationsStmt->execute(array_merge([$id], $validMethods));
 $combinations = $combinationsStmt->fetchAll(PDO::FETCH_COLUMN);
 
 $filterYear = isset($_GET['year'])
@@ -68,9 +63,21 @@ $filterYear = isset($_GET['year'])
 $filterMethod = trim((string)($_GET['method'] ?? ''));
 $filterCombination = trim((string)($_GET['combination'] ?? ''));
 
+if ($filterMethod !== '' && !in_array($filterMethod, $validMethods, true)) {
+    $filterMethod = '';
+}
+
 // ── Lấy điểm theo bộ lọc ─────────────────────────────────────
 $where = ['s.university_id = :university_id'];
 $params = [':university_id' => $id];
+
+$validMethodKeys = [];
+foreach ($validMethods as $index => $methodValue) {
+    $key = ':valid_method_' . $index;
+    $validMethodKeys[] = $key;
+    $params[$key] = $methodValue;
+}
+$where[] = 's.method IN (' . implode(', ', $validMethodKeys) . ')';
 
 if ($filterYear > 0) {
     $where[] = 's.year = :year';
@@ -116,8 +123,9 @@ $statsStmt = $db->prepare("
         MAX(year) AS latest_year
     FROM admission_scores
     WHERE university_id = ?
+      AND method IN ($methodPlaceholders)
 ");
-$statsStmt->execute([$id]);
+$statsStmt->execute(array_merge([$id], $validMethods));
 $stats = $statsStmt->fetch();
 ?>
 

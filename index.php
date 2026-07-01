@@ -11,24 +11,7 @@ $tab     = isset($_GET['major']) ? 'major' : 'uni';
 $showAll = ($_GET['show_all'] ?? '') === '1';
 $isHome  = $q === '' && $mid === 0;
 
-$methods = [
-    'THPT' => [
-        'label' => 'Thi THPT',
-        'color' => 'primary'
-    ],
-    'HocBa' => [
-        'label' => 'Học bạ',
-        'color' => 'success'
-    ],
-    'TongHop' => [
-        'label' => 'Tổng hợp',
-        'color' => 'warning'
-    ],
-    'DGNL' => [
-        'label' => 'Đánh giá NL',
-        'color' => 'info'
-    ]
-];
+$methods = getAdmissionMethods();
 
 $allMajors = $db->query("
     SELECT major_id, major_name
@@ -115,7 +98,6 @@ if ($mid > 0) {
         $stmt->execute($yearParams);
         $latestYear = (int)$stmt->fetchColumn();
     }
-
     if ($latestYear > 0) {
         $majorWhere = "
             s.major_id = :mid
@@ -332,7 +314,7 @@ function render_uni_card(array $university)
             <div class="d-flex justify-content-center gap-2 mb-3">
                 <button
                     type="button"
-                    onclick="switchTab('uni')"
+                    onclick="switchHomeTab('uni')"
                     id="tab-uni"
                     class="btn fw-semibold px-4 <?= $tab === 'uni' ? 'btn-light' : 'btn-outline-light' ?>"
                     style="border-radius:30px"
@@ -343,7 +325,7 @@ function render_uni_card(array $university)
 
                 <button
                     type="button"
-                    onclick="switchTab('major')"
+                    onclick="switchHomeTab('major')"
                     id="tab-major"
                     class="btn fw-semibold px-4 <?= $tab === 'major' ? 'btn-light' : 'btn-outline-light' ?>"
                     style="border-radius:30px"
@@ -389,7 +371,7 @@ function render_uni_card(array $university)
                 id="form-major"
                 class="js-home-search-form <?= $tab === 'uni' ? 'd-none' : '' ?>"
             >
-                <div class="search-hero mx-auto" style="max-width:1000px">
+                <div class="search-hero mx-auto" style="max-width:850px">
                     <i class="bi bi-book"></i>
 
                     <select
@@ -562,9 +544,8 @@ function render_uni_card(array $university)
                                     ? 'sb-hi'
                                     : ($row['score'] >= 23 ? 'sb-mid' : 'sb-lo');
 
-                                $methodItem  = $methods[$row['method']] ?? null;
-                                $methodColor = $methodItem['color'] ?? 'secondary';
-                                $methodLabel = $methodItem['label'] ?? $row['method'];
+                                $methodColor = methodColor((string)$row['method']);
+                                $methodLabel = methodLabel((string)$row['method']);
                                 ?>
 
                                 <tr>
@@ -953,6 +934,7 @@ function render_uni_card(array $university)
 <script>
 function switchHomeTab(tab) {
     const isUniversityTab = tab === 'uni';
+
     const formUni = document.getElementById('form-uni');
     const formMajor = document.getElementById('form-major');
     const tabUni = document.getElementById('tab-uni');
@@ -960,16 +942,21 @@ function switchHomeTab(tab) {
     const featuredUniversities = document.getElementById('featured-universities');
     const featuredMajors = document.getElementById('featured-majors');
 
-    formUni.classList.toggle('d-none', !isUniversityTab);
-    formMajor.classList.toggle('d-none', isUniversityTab);
+    formUni?.classList.toggle('d-none', !isUniversityTab);
+    formMajor?.classList.toggle('d-none', isUniversityTab);
 
-    tabUni.classList.toggle('btn-light', isUniversityTab);
-    tabUni.classList.toggle('btn-outline-light', !isUniversityTab);
-    tabMajor.classList.toggle('btn-light', !isUniversityTab);
-    tabMajor.classList.toggle('btn-outline-light', isUniversityTab);
+    tabUni?.classList.toggle('btn-light', isUniversityTab);
+    tabUni?.classList.toggle('btn-outline-light', !isUniversityTab);
+    tabMajor?.classList.toggle('btn-light', !isUniversityTab);
+    tabMajor?.classList.toggle('btn-outline-light', isUniversityTab);
 
     featuredUniversities?.classList.toggle('d-none', !isUniversityTab);
     featuredMajors?.classList.toggle('d-none', isUniversityTab);
+}
+
+// Giữ lại tên cũ để tránh lỗi nếu file JS khác còn gọi switchTab().
+function switchTab(tab) {
+    switchHomeTab(tab);
 }
 
 <?php if ($mid > 0): ?>

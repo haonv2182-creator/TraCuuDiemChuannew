@@ -32,8 +32,7 @@ function recommend_by_score(
               AND s2.major_id = s.major_id
               AND COALESCE(s2.method, '') = COALESCE(s.method, '')
               AND COALESCE(s2.combination, '') = COALESCE(s.combination, '')
-        )",
-        "s.method <> 'Thang'"
+        )"
     ];
 
     $params = [];
@@ -120,7 +119,6 @@ $combinations = $db->query("
     FROM admission_scores
     WHERE combination IS NOT NULL
       AND TRIM(combination) <> ''
-      AND method <> 'Thang'
     ORDER BY combination
 ")->fetchAll(PDO::FETCH_COLUMN);
 
@@ -129,7 +127,6 @@ $methods = $db->query("
     FROM admission_scores
     WHERE method IS NOT NULL
       AND TRIM(method) <> ''
-      AND method <> 'Thang'
     ORDER BY method
 ")->fetchAll(PDO::FETCH_COLUMN);
 

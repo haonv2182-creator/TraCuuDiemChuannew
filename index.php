@@ -12,6 +12,12 @@ $showAll = ($_GET['show_all'] ?? '') === '1';
 $isHome  = $q === '' && $mid === 0;
 
 $methods = getAdmissionMethods();
+$validMethods = array_keys($methods);
+$validMethodSql = implode(',', array_map([$db, 'quote'], $validMethods));
+
+if ($method !== '' && !in_array($method, $validMethods, true)) {
+    $method = '';
+}
 
 $allMajors = $db->query("
     SELECT major_id, major_name
@@ -22,6 +28,7 @@ $allMajors = $db->query("
 $years = $db->query("
     SELECT DISTINCT year
     FROM admission_scores
+    WHERE method IN ($validMethodSql)
     ORDER BY year DESC
 ")->fetchAll(PDO::FETCH_COLUMN);
 
@@ -33,6 +40,7 @@ $popularMajors = $db->query("
     FROM majors m
     LEFT JOIN admission_scores s
         ON m.major_id = s.major_id
+       AND s.method IN ($validMethodSql)
     GROUP BY m.major_id, m.major_name
     ORDER BY total_scores DESC, m.major_name ASC
     LIMIT 5
@@ -52,6 +60,7 @@ if ($q !== '') {
         FROM universities u
         LEFT JOIN admission_scores s
             ON u.university_id = s.university_id
+           AND s.method IN ($validMethodSql)
         WHERE u.university_name LIKE :q
         GROUP BY
             u.university_id,
@@ -85,6 +94,7 @@ if ($mid > 0) {
             SELECT MAX(year)
             FROM admission_scores
             WHERE major_id = :mid
+              AND method IN ($validMethodSql)
         ";
 
         $yearParams = [':mid' => $mid];
@@ -102,6 +112,7 @@ if ($mid > 0) {
         $majorWhere = "
             s.major_id = :mid
             AND s.year = :year
+            AND s.method IN ($validMethodSql)
         ";
         $majorParams = [
             ':mid'  => $mid,
@@ -155,6 +166,7 @@ $featuredLimit = $showAll ? '' : 'LIMIT 8';
             FROM universities u
             LEFT JOIN admission_scores s
                 ON u.university_id = s.university_id
+               AND s.method IN ($validMethodSql)
             $featuredFilter
             GROUP BY
                 u.university_id,
@@ -174,6 +186,7 @@ $featuredLimit = $showAll ? '' : 'LIMIT 8';
         FROM majors m
         LEFT JOIN admission_scores s
             ON m.major_id = s.major_id
+           AND s.method IN ($validMethodSql)
         GROUP BY m.major_id, m.major_name
         ORDER BY university_count DESC, m.major_name ASC
         LIMIT 8
@@ -184,7 +197,7 @@ $stats = $db->query("
     SELECT
         (SELECT COUNT(*) FROM universities) AS unis,
         (SELECT COUNT(*) FROM majors) AS majors,
-        (SELECT COUNT(*) FROM admission_scores) AS scores
+        (SELECT COUNT(*) FROM admission_scores WHERE method IN ($validMethodSql)) AS scores
 ")->fetch();
 
 $statItems = [

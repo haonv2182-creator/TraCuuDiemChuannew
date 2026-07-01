@@ -309,10 +309,6 @@ if ($latestOnly) {
 <section class="sub-page-hero search-page-hero">
   <div class="container">
     <div class="search-hero-content">
-      <span class="sub-page-label">
-        <i class="bi bi-funnel"></i>
-        Tra cứu nâng cao
-      </span>
 
       <h1 class="sub-page-title">Tra cứu nâng cao</h1>
 

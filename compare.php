@@ -316,27 +316,27 @@ $latestDifference = (
     : null;
 ?>
 
-<div class="container py-5 compare-page">
+<div class="container py-5 compare-page sub-page-content">
 
     <!-- Tiêu đề -->
-    <div class="container py-5 compare-page">
+    <div class="container py-5 compare-page sub-page-content">
     <div class="row justify-content-center">
         <div class="col-xl-10">
 
-            <div class="text-center mb-4">
-                <span class="section-label">
-                    Công cụ đối chiếu
-                </span>
+            <section class="sub-page-hero compare-page-hero">
+                <div class="container">
+                    <div class="compare-hero-content text-center">
+                    <h1 class="sub-page-title">
+                        <i class="bi bi-bar-chart-line me-2"></i>
+                        So sánh điểm chuẩn
+                    </h1>
 
-                <h2 class="fw-bold mt-2 mb-2">
-                    <i class="bi bi-bar-chart-line text-primary me-2"></i>
-                    So sánh điểm chuẩn
-                </h2>
-
-                <p class="text-muted mb-0">
-                    So sánh cùng ngành và cùng phương thức xét tuyển giữa hai trường
-                </p>
-            </div>
+                    <p class="sub-page-subtitle">
+                        So sánh cùng ngành và cùng phương thức xét tuyển giữa hai trường
+                    </p>
+                    </div>
+                </div>
+                </section>
 
     <!-- Form chọn dữ liệu -->
     <div class="card shadow-sm mb-4 compare-control-card">

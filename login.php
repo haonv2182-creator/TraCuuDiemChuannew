@@ -19,7 +19,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($user !== '' && $pass !== '') {
         $db = getDB();
 
-        $stmt = $db->prepare("SELECT * FROM users WHERE username = ? LIMIT 1");
+        $stmt = $db->prepare("
+            SELECT user_id, username, password, role
+            FROM users
+            WHERE username = ?
+            LIMIT 1
+        ");
         $stmt->execute([$user]);
         $row = $stmt->fetch();
 
@@ -67,8 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <label class="form-label fw-semibold">Tên đăng nhập</label>
           <div class="input-group">
             <span class="input-group-text"><i class="bi bi-person"></i></span>
-            <input type="text" name="username" class="form-control form-control-lg"
-                   value="admin" required autofocus>
+            <input type="text" name="username" class="form-control form-control-lg" required autofocus>
           </div>
         </div>
 

@@ -6,6 +6,7 @@ $db      = getDB();
 $q       = trim($_GET['q'] ?? '');
 $mid     = (int)($_GET['major'] ?? 0);
 $method  = trim($_GET['method'] ?? '');
+$year = (int)($_GET['year'] ?? 0);
 $tab     = isset($_GET['major']) ? 'major' : 'uni';
 $showAll = ($_GET['show_all'] ?? '') === '1';
 $isHome  = $q === '' && $mid === 0;
@@ -34,6 +35,12 @@ $allMajors = $db->query("
     FROM majors
     ORDER BY major_name
 ")->fetchAll();
+
+$years = $db->query("
+    SELECT DISTINCT year
+    FROM admission_scores
+    ORDER BY year DESC
+")->fetchAll(PDO::FETCH_COLUMN);
 
 $popularMajors = $db->query("
     SELECT
@@ -88,21 +95,26 @@ if ($mid > 0) {
     $stmt->execute([$mid]);
     $majorName = (string)$stmt->fetchColumn();
 
-    $yearSql = "
-        SELECT MAX(year)
-        FROM admission_scores
-        WHERE major_id = :mid
-    ";
-    $yearParams = [':mid' => $mid];
+    if ($year > 0) {
+        $latestYear = $year;
+    } else {
+        $yearSql = "
+            SELECT MAX(year)
+            FROM admission_scores
+            WHERE major_id = :mid
+        ";
 
-    if ($method !== '') {
-        $yearSql .= ' AND method = :method';
-        $yearParams[':method'] = $method;
+        $yearParams = [':mid' => $mid];
+
+        if ($method !== '') {
+            $yearSql .= ' AND method = :method';
+            $yearParams[':method'] = $method;
+        }
+
+        $stmt = $db->prepare($yearSql);
+        $stmt->execute($yearParams);
+        $latestYear = (int)$stmt->fetchColumn();
     }
-
-    $stmt = $db->prepare($yearSql);
-    $stmt->execute($yearParams);
-    $latestYear = (int)$stmt->fetchColumn();
 
     if ($latestYear > 0) {
         $majorWhere = "
@@ -377,7 +389,7 @@ function render_uni_card(array $university)
                 id="form-major"
                 class="js-home-search-form <?= $tab === 'uni' ? 'd-none' : '' ?>"
             >
-                <div class="search-hero mx-auto" style="max-width:850px">
+                <div class="search-hero mx-auto" style="max-width:1000px">
                     <i class="bi bi-book"></i>
 
                     <select
@@ -413,6 +425,24 @@ function render_uni_card(array $university)
                                 <?= $method === $value ? 'selected' : '' ?>
                             >
                                 <?= e($item['label']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+
+                    <select
+                        name="year"
+                        class="form-select border-0 bg-transparent"
+                        style="max-width:150px;outline:none;font-size:14px;font-family:inherit;border-left:1px solid var(--gray-200)!important"
+                        onchange="this.form.submit()"
+                    >
+                        <option value="0">Năm mới nhất</option>
+
+                        <?php foreach ($years as $y): ?>
+                            <option
+                                value="<?= e($y) ?>"
+                                <?= $year === (int)$y ? 'selected' : '' ?>
+                            >
+                                <?= e($y) ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -472,7 +502,7 @@ function render_uni_card(array $university)
                     <?= count($majorResults) ?> kết quả
 
                     <?php if (!empty($majorResults)): ?>
-                        · Dữ liệu năm <?= e($majorResults[0]['year']) ?> mới nhất
+                        · Dữ liệu năm <?= e($majorResults[0]['year']) ?><?= $year > 0 ? '' : ' mới nhất' ?>
                     <?php endif; ?>
 
                     <?php if ($method !== ''): ?>

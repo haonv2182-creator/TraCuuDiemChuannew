@@ -29,31 +29,7 @@ if (!$major) {
 $pageTitle = $major['major_name'] . ' – DiemChuan.vn';
 require_once 'includes/header.php';
 
-function major_method_label(string $method): string
-{
-    $labels = [
-        'THPT'    => 'Thi THPT',
-        'HocBa'   => 'Học bạ',
-        'TongHop' => 'Tổng hợp',
-        'DGNL'    => 'Đánh giá năng lực',
 
-    ];
-
-    return $labels[$method] ?? $method;
-}
-
-function major_method_color(string $method): string
-{
-    $colors = [
-        'THPT'    => 'primary',
-        'HocBa'   => 'success',
-        'TongHop' => 'warning',
-        'DGNL'    => 'info',
-  
-    ];
-
-    return $colors[$method] ?? 'secondary';
-}
 
 // ── Năm mới nhất ─────────────────────────────────────────────
 $latestYearStmt = $db->prepare("
@@ -314,7 +290,7 @@ $trendSchools = array_values(array_unique(array_column($trend, 'university_name'
                     value="<?= e($methodValue) ?>"
                     <?= $filterMethod === $methodValue ? 'selected' : '' ?>
                   >
-                    <?= e(major_method_label($methodValue)) ?>
+                    <?= e(methodLabel($methodValue)) ?>
                   </option>
                 <?php endforeach; ?>
               </select>
@@ -409,10 +385,10 @@ $trendSchools = array_values(array_unique(array_column($trend, 'university_name'
                     <td>
                       <?php if ($methodValue !== ''): ?>
                         <span
-                          class="badge text-bg-<?= e(major_method_color($methodValue)) ?> fw-normal"
+                          class="badge text-bg-<?= e(methodColor($methodValue)) ?> fw-normal"
                           style="font-size:10px;border-radius:20px"
                         >
-                          <?= e(major_method_label($methodValue)) ?>
+                          <?= e(methodLabel($methodValue)) ?>
                         </span>
                       <?php else: ?>
                         <span class="text-muted">—</span>

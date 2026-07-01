@@ -236,21 +236,12 @@ $majorName = recommend_major_name($majors, $majorId);
         Nhập điểm xét tuyển để hệ thống đề xuất các lựa chọn an toàn, phù hợp và thử sức
       </p>
     </div>
+  </div>
+</section>
 
 <div class="container py-5 ai-page sub-page-content">
     <div class="row justify-content-center">
         <div class="col-xl-10">
-
-            <div class="text-center mb-4">
-                <h2 class="fw-bold mt-2 mb-2">
-                    <i class="bi bi-stars text-primary me-2"></i>
-                    Gợi ý trường theo điểm
-                </h2>
-
-                <p class="text-muted mb-0">
-                    Nhập điểm và tiêu chí của bạn để xem các lựa chọn an toàn, phù hợp và thử sức
-                </p>
-            </div>
 
             <div class="card shadow-sm mb-4">
                 <div class="card-body p-4">

@@ -316,28 +316,29 @@ $latestDifference = (
     : null;
 ?>
 
-<div class="container py-5 compare-page sub-page-content">
+<section class="sub-page-hero compare-page-hero">
+    <div class="container">
+        <div class="compare-hero-content text-center">
+            <h1 class="sub-page-title">
+                <i class="bi bi-bar-chart-line me-2"></i>
+                So sánh điểm chuẩn
+            </h1>
 
-    <!-- Tiêu đề -->
-    <div class="container py-5 compare-page sub-page-content">
+            <p class="sub-page-subtitle">
+                So sánh cùng ngành và cùng phương thức xét tuyển giữa hai trường
+            </p>
+        </div>
+    </div>
+</section>
+
+<div class="container py-5 compare-page sub-page-content">
     <div class="row justify-content-center">
         <div class="col-xl-10">
 
-            <section class="sub-page-hero compare-page-hero">
-                <div class="container">
-                    <div class="compare-hero-content text-center">
-                    <h1 class="sub-page-title">
-                        <i class="bi bi-bar-chart-line me-2"></i>
-                        So sánh điểm chuẩn
-                    </h1>
-
-                    <p class="sub-page-subtitle">
-                        So sánh cùng ngành và cùng phương thức xét tuyển giữa hai trường
-                    </p>
-                    </div>
-                </div>
-                </section>
-
+            <!-- Form chọn dữ liệu -->
+            <div class="card shadow-sm mb-4 compare-control-card">
+                <div class="card-body p-4">
+                    <form method="GET" id="compareForm">
     <!-- Form chọn dữ liệu -->
     <div class="card shadow-sm mb-4 compare-control-card">
         <div class="card-body p-4">
@@ -924,4 +925,5 @@ document.addEventListener('DOMContentLoaded', function () {
 <?php endif; ?>
         </div>
     </div>
+ </div>
 <?php require_once 'includes/footer.php'; ?>

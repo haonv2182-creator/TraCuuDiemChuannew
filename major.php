@@ -36,7 +36,7 @@ function major_method_label(string $method): string
         'HocBa'   => 'Học bạ',
         'TongHop' => 'Tổng hợp',
         'DGNL'    => 'Đánh giá năng lực',
-        'Thang'   => 'Xét thẳng'
+
     ];
 
     return $labels[$method] ?? $method;
@@ -49,7 +49,7 @@ function major_method_color(string $method): string
         'HocBa'   => 'success',
         'TongHop' => 'warning',
         'DGNL'    => 'info',
-        'Thang'   => 'secondary'
+  
     ];
 
     return $colors[$method] ?? 'secondary';

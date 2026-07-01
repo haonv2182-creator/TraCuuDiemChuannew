@@ -28,7 +28,6 @@ function search_method_label(string $value): string
         'HocBa'   => 'Học bạ',
         'TongHop' => 'Tổng hợp',
         'DGNL'    => 'Đánh giá năng lực',
-        'Thang'   => 'Xét thẳng'
     ];
 
     return $labels[$value] ?? $value;
@@ -44,7 +43,6 @@ function search_method_color(string $value): string
         'HocBa'   => 'success',
         'TongHop' => 'warning',
         'DGNL'    => 'info',
-        'Thang'   => 'secondary'
     ];
 
     return $colors[$value] ?? 'secondary';

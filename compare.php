@@ -20,7 +20,6 @@ function compare_method_label(string $method): string
         'HocBa'   => 'Học bạ',
         'TongHop' => 'Tổng hợp',
         'DGNL'    => 'Đánh giá năng lực',
-        'Thang'   => 'Xét thẳng'
     ];
 
     return $labels[$method] ?? $method;

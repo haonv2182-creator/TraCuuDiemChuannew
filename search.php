@@ -43,6 +43,11 @@ if (!isset($sortOptions[$sort])) {
 }
 
 $orderSql = $sortOptions[$sort]['sql'];
+$validMethods = array_keys(getAdmissionMethods());
+
+if ($method !== '' && !in_array($method, $validMethods, true)) {
+    $method = '';
+}
 
 $where  = ['1 = 1'];
 $params = [];
@@ -177,13 +182,7 @@ $combinations = $db->query("
     ORDER BY combination
 ")->fetchAll(PDO::FETCH_COLUMN);
 
-$methods = $db->query("
-    SELECT DISTINCT method
-    FROM admission_scores
-    WHERE method IS NOT NULL
-      AND TRIM(method) <> ''
-    ORDER BY method
-")->fetchAll(PDO::FETCH_COLUMN);
+$methods = $validMethods;
 
 $provinces  = getProvinces();
 $schoolTypes = ['Công lập', 'Dân lập', 'Tư thục', 'Quốc tế'];

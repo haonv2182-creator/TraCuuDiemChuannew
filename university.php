@@ -239,7 +239,7 @@ require __DIR__ . '/includes/header.php';
         <div class="col-md-4">
             <div class="stat-card">
                 <div class="value">
-                    <?= e($stats['latest_year'] ?: '—') ?>
+                    <?= e((string)($stats['latest_year'] ?: '—')) ?>
                 </div>
                 <div class="text-muted">Năm cập nhật mới nhất</div>
             </div>
@@ -379,7 +379,7 @@ require __DIR__ . '/includes/header.php';
 <script>
 makeLineChart(
     'trendChart',
-    <?= json_encode(array_map('strval', array_column($trend, 'year')), JSON_UNESCAPED_UNICODE) ?>
+    <?= json_encode(array_map('strval', array_column($trend, 'year')), JSON_UNESCAPED_UNICODE) ?>,
     [
         {
             label: 'Điểm trung bình',

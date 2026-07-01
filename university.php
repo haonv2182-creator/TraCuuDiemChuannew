@@ -29,30 +29,6 @@ if (!$university) {
 $pageTitle = $university['university_name'] . ' – DiemChuan.vn';
 require_once 'includes/header.php';
 
-function university_method_label(string $method): string
-{
-    $labels = [
-        'THPT'    => 'Thi THPT',
-        'HocBa'   => 'Học bạ',
-        'TongHop' => 'Tổng hợp',
-        'DGNL'    => 'Đánh giá năng lực',
-    ];
-
-    return $labels[$method] ?? $method;
-}
-
-function university_method_color(string $method): string
-{
-    $colors = [
-        'THPT'    => 'primary',
-        'HocBa'   => 'success',
-        'TongHop' => 'warning',
-        'DGNL'    => 'info',
-    ];
-
-    return $colors[$method] ?? 'secondary';
-}
-
 // ── Dữ liệu cho bộ lọc ───────────────────────────────────────
 $yearsStmt = $db->prepare("
     SELECT DISTINCT year
@@ -272,7 +248,7 @@ $stats = $statsStmt->fetch();
                     value="<?= e($methodValue) ?>"
                     <?= $filterMethod === $methodValue ? 'selected' : '' ?>
                   >
-                    <?= e(university_method_label($methodValue)) ?>
+                    <?= e(methodLabel($methodValue)) ?>
                   </option>
                 <?php endforeach; ?>
               </select>
@@ -373,10 +349,10 @@ $stats = $statsStmt->fetch();
                     <td>
                       <?php if ($methodValue !== ''): ?>
                         <span
-                          class="badge text-bg-<?= e(university_method_color($methodValue)) ?> fw-normal"
+                          class="badge text-bg-<?= e(methodColor($methodValue)) ?> fw-normal"
                           style="font-size:10px;border-radius:20px"
                         >
-                          <?= e(university_method_label($methodValue)) ?>
+                          <?= e(methodLabel($methodValue)) ?>
                         </span>
                       <?php else: ?>
                         <span class="text-muted">—</span>
@@ -388,8 +364,6 @@ $stats = $statsStmt->fetch();
                         <?= number_format((float)$row['score'], 2) ?>
                       </span>
                     </td>
-
-
                   </tr>
                 <?php endforeach; ?>
               <?php endif; ?>
@@ -423,7 +397,7 @@ $stats = $statsStmt->fetch();
 
           <tr>
             <td class="text-muted">Năm dữ liệu mới nhất</td>
-            <td><?= e($stats['latest_year'] ?? '—') ?></td>
+            <td><?= e((string)($stats['latest_year'] ?? '—')) ?></td>
           </tr>
 
         </table>

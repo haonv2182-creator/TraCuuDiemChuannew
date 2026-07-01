@@ -4011,6 +4011,53 @@ body {
   color: #fff;
   background:
     linear-gradient(90deg,
+      rgba(30, 64, 175, .99) 0%,
+      rgba(91, 33, 182, .95) 50%,
+      rgba(157, 23, 77, .90) 100%
+    ),
+    url('../images/search-hero-bg.png') center center / cover no-repeat !important;
+}
+
+.search-hero-content {
+  max-width: 720px;
+}
+
+.search-page-hero .sub-page-title {
+  margin-top: 14px;
+  margin-bottom: 10px;
+  font-size: clamp(34px, 5vw, 56px);
+  font-weight: 800;
+  color: #fff !important;
+}
+
+.search-page-hero .sub-page-subtitle {
+  max-width: 620px;
+  color: rgba(255,255,255,.9) !important;
+}
+
+.sub-page-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 15px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  background: rgba(255,255,255,.14);
+  border: 1px solid rgba(255,255,255,.24);
+}
+
+.sub-page-content {
+  margin-top: -52px;
+  position: relative;
+  z-index: 5;
+}
+.search-page-hero {
+  min-height: 260px;
+  padding: 70px 0 95px;
+  color: #fff;
+  background:
+    linear-gradient(90deg,
       rgba(29, 78, 216, .95) 0%,
       rgba(79, 70, 229, .78) 45%,
       rgba(124, 58, 237, .42) 100%
@@ -4037,7 +4084,6 @@ body {
 
 .sub-page-label {
   display: inline-flex;
-  align-items: center;
   gap: 6px;
   padding: 7px 15px;
   border-radius: 999px;

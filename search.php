@@ -18,35 +18,6 @@ $latestOnly = isset($_GET['latest']) && $_GET['latest'] === '1';
 $page       = max(1, (int)($_GET['page'] ?? 1));
 $limit      = 20;
 
-/**
- * Tên hiển thị của phương thức xét tuyển.
- */
-function search_method_label(string $value): string
-{
-    $labels = [
-        'THPT'    => 'Thi THPT',
-        'HocBa'   => 'Học bạ',
-        'TongHop' => 'Tổng hợp',
-        'DGNL'    => 'Đánh giá năng lực',
-    ];
-
-    return $labels[$value] ?? $value;
-}
-
-/**
- * Màu badge phương thức.
- */
-function search_method_color(string $value): string
-{
-    $colors = [
-        'THPT'    => 'primary',
-        'HocBa'   => 'success',
-        'TongHop' => 'warning',
-        'DGNL'    => 'info',
-    ];
-
-    return $colors[$value] ?? 'secondary';
-}
 
 $sortOptions = [
     'year_desc'  => [
@@ -276,7 +247,7 @@ if ($schoolType !== '') {
 
 if ($method !== '') {
     $activeFilters[] = [
-        'Phương thức: ' . search_method_label($method),
+        'Phương thức: ' . methodLabel($method),
         array_merge($_GET, ['method' => '', 'page' => 1])
     ];
 }
@@ -467,7 +438,7 @@ if ($latestOnly) {
                   value="<?= e($methodValue) ?>"
                   <?= $method === $methodValue ? 'selected' : '' ?>
                 >
-                  <?= e(search_method_label($methodValue)) ?>
+                  <?= e(methodLabel($methodValue)) ?>
                 </option>
               <?php endforeach; ?>
             </select>
@@ -734,10 +705,10 @@ if ($latestOnly) {
                     <td>
                       <?php if ($methodValue !== ''): ?>
                         <span
-                          class="badge text-bg-<?= e(search_method_color($methodValue)) ?> fw-normal"
+                          class="badge text-bg-<?= e(methodColor($methodValue)) ?> fw-normal"
                           style="font-size:10px;border-radius:20px"
                         >
-                          <?= e(search_method_label($methodValue)) ?>
+                          <?= e(methodLabel($methodValue)) ?>
                         </span>
                       <?php else: ?>
                         <span class="text-muted small">—</span>
